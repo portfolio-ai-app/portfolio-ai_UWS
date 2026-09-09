@@ -4407,3 +4407,135 @@ button:active,.premium-segmented button:active,.trade-mode-toggle:active{transfo
 @media(prefers-reduced-motion:reduce){
   .glass-surface,button,.trade-mode-toggle{transition:none!important;animation:none!important}
 }
+
+
+/* =========================================================
+   V24 — FUTURISTIC LIQUID GLASS + SIMPLE-AS-A-DUCK UX
+========================================================= */
+body{
+  position:relative;
+  isolation:isolate;
+  overflow-x:hidden;
+}
+.ambient-orb,.ambient-grid{position:fixed;pointer-events:none;z-index:-2}
+.ambient-orb{width:42vw;height:42vw;border-radius:50%;filter:blur(70px);opacity:.12;animation:orbFloat 16s ease-in-out infinite alternate}
+.ambient-orb-a{top:-12vw;left:-8vw;background:radial-gradient(circle,rgba(0,122,255,.9),transparent 68%)}
+.ambient-orb-b{right:-12vw;bottom:-15vw;background:radial-gradient(circle,rgba(94,92,230,.8),transparent 68%);animation-duration:20s}
+.ambient-grid{inset:0;background-image:linear-gradient(rgba(127,127,127,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(127,127,127,.025) 1px,transparent 1px);background-size:42px 42px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.6),transparent 78%)}
+
+@keyframes orbFloat{
+  from{transform:translate3d(-2%,0,0) scale(1)}
+  to{transform:translate3d(8%,6%,0) scale(1.12)}
+}
+
+.app-view{transform-origin:50% 20%}
+.app-view.view-enter{animation:viewIn .55s cubic-bezier(.16,.84,.24,1) both}
+@keyframes viewIn{
+  from{opacity:0;transform:translateY(14px) scale(.992);filter:blur(7px)}
+  to{opacity:1;transform:none;filter:blur(0)}
+}
+
+.glass-surface,
+.premium-intelligence,
+.capital-check-card,
+.trade-planner-card,
+.trade-size-recommendation,
+.trade-duck-summary,
+.premium-snapshot-grid article{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.20),rgba(255,255,255,.04)),
+    var(--glass-bg)!important;
+  border:1px solid rgba(255,255,255,.32)!important;
+  box-shadow:
+    0 24px 70px rgba(15,25,45,.10),
+    inset 0 1px 0 rgba(255,255,255,.50),
+    inset 0 -1px 0 rgba(255,255,255,.05)!important;
+  -webkit-backdrop-filter:blur(32px) saturate(165%);
+  backdrop-filter:blur(32px) saturate(165%);
+}
+[data-theme="dark"] .glass-surface,
+[data-theme="dark"] .premium-intelligence,
+[data-theme="dark"] .capital-check-card,
+[data-theme="dark"] .trade-planner-card,
+[data-theme="dark"] .trade-size-recommendation,
+[data-theme="dark"] .trade-duck-summary{
+  background:
+    linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.015)),
+    rgba(18,18,22,.54)!important;
+  border-color:rgba(255,255,255,.10)!important;
+  box-shadow:0 28px 80px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+
+.trade-duck-summary{padding:20px;border-radius:24px;margin-bottom:12px}
+.trade-duck-top{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}
+.trade-duck-top h3{margin:6px 0 4px;color:var(--apple-text);font-size:21px;letter-spacing:-.045em}
+.trade-duck-top p{margin:0;max-width:650px;color:var(--apple-secondary);font-size:10px;line-height:1.5}
+.trade-duck-badge{padding:6px 9px;border-radius:999px;background:rgba(0,122,255,.10);color:var(--apple-blue);font-size:7px;font-weight:800;letter-spacing:.08em}
+
+.trade-duck-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.trade-duck-grid article{padding:14px;border-radius:16px;background:rgba(127,127,127,.045);border:1px solid var(--apple-hairline)}
+.trade-duck-grid span,.trade-duck-grid small{display:block;color:var(--apple-secondary)}
+.trade-duck-grid span{font-size:7px;font-weight:800;letter-spacing:.07em}
+.trade-duck-grid strong{display:block;margin:8px 0 3px;color:var(--apple-text);font-size:18px;letter-spacing:-.035em}
+.trade-duck-grid small{font-size:7px}
+
+.trade-duck-size{margin-top:9px;padding:17px;border-radius:18px;background:linear-gradient(135deg,rgba(0,122,255,.10),rgba(94,92,230,.05));border:1px solid rgba(0,122,255,.13)}
+.trade-duck-size span{display:block;color:var(--apple-secondary);font-size:7px;font-weight:800;letter-spacing:.08em}
+.trade-duck-size strong{display:block;margin:7px 0 3px;color:var(--apple-text);font-size:28px;letter-spacing:-.05em}
+.trade-duck-size p{margin:0;color:var(--apple-secondary);font-size:8px;line-height:1.45}
+.trade-duck-explain{display:flex;gap:5px;margin-top:10px;padding:10px 12px;border-radius:13px;background:rgba(127,127,127,.045);color:var(--apple-secondary);font-size:8px;line-height:1.45}
+.trade-duck-explain strong{color:var(--apple-text)}
+
+.capital-simple-answer{margin-top:14px;padding:15px 16px;border-radius:17px;background:linear-gradient(135deg,rgba(0,122,255,.10),rgba(94,92,230,.055));border:1px solid rgba(0,122,255,.14)}
+.capital-simple-answer span{display:block;color:var(--apple-blue);font-size:7px;font-weight:800;letter-spacing:.09em}
+.capital-simple-answer strong{display:block;margin:6px 0 3px;color:var(--apple-text);font-size:19px;letter-spacing:-.04em}
+.capital-simple-answer p{margin:0;color:var(--apple-secondary);font-size:9px;line-height:1.5}
+
+/* Make beginner trade view visually dominate over technical controls */
+[data-view="trade"]:not(.trade-show-advanced) .trade-simple-flow{display:none}
+[data-view="trade"]:not(.trade-show-advanced) .trade-beginner-bar{
+  padding:14px 16px;border-radius:18px
+}
+[data-view="trade"]:not(.trade-show-advanced) .trade-beginner-bar h2{font-size:16px}
+[data-view="trade"]:not(.trade-show-advanced) .trade-beginner-bar p{font-size:9px}
+
+/* Animated glass shimmer */
+.glass-surface:after,
+.premium-intelligence:after,
+.capital-check-card:after,
+.trade-duck-summary:after{
+  content:"";position:absolute;inset:-35% auto auto -30%;width:36%;height:180%;transform:rotate(18deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.16),transparent);opacity:0;
+  pointer-events:none
+}
+@media(hover:hover){
+  .glass-surface:hover:after,.premium-intelligence:hover:after,.capital-check-card:hover:after,.trade-duck-summary:hover:after{
+    animation:glassSweep .9s ease
+  }
+}
+@keyframes glassSweep{
+  0%{left:-35%;opacity:0}
+  20%{opacity:.55}
+  100%{left:115%;opacity:0}
+}
+
+/* Floating selected state */
+.premium-segmented button.active,
+.app-nav .active,
+nav .active{
+  box-shadow:0 8px 22px rgba(0,122,255,.15),inset 0 1px 0 rgba(255,255,255,.35)!important;
+  transform:translateY(-1px)
+}
+
+@media(max-width:760px){
+  .trade-duck-top{flex-direction:column}
+  .trade-duck-grid{grid-template-columns:1fr 1fr}
+}
+@media(max-width:460px){
+  .trade-duck-grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  .ambient-orb,.app-view.view-enter,.glass-surface:after,.premium-intelligence:after,.capital-check-card:after,.trade-duck-summary:after{
+    animation:none!important
+  }
+}

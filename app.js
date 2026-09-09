@@ -4174,6 +4174,8 @@
     );
 
     grid.innerHTML = html;
+  
+    updateTradeDuckSummary();
   }
 
 
@@ -5885,6 +5887,7 @@
 
     if (gaugeFill) gaugeFill.style.width = gaugePct + "%";
     if (gaugeMarker) gaugeMarker.style.left = gaugePct + "%";
+    updateCapitalSimpleAnswer();
   }
 
   function updatePremiumIntelligence(){
@@ -6028,6 +6031,111 @@
         setTradeBeginnerMode(!(tradeView && tradeView.classList.contains("trade-show-advanced")));
       });
     }
+  }
+
+
+  function safeMoney(v) {
+    var n = Number(v);
+    if (!isFinite(n)) return "$—";
+    return "$" + n.toLocaleString("en-US", {minimumFractionDigits:2, maximumFractionDigits:2});
+  }
+
+  function updateTradeDuckSummary() {
+    var state = null;
+    try {
+      state = buildAIState();
+    } catch (e) {}
+
+    var plan = null;
+    try {
+      if (state && state.assets && state.assets.length) {
+        plan = buildTradePlan(state.assets[0], state);
+      }
+    } catch (e) {}
+
+    var direction = el("duckDirection");
+    var directionNote = el("duckDirectionNote");
+    var entry = el("duckEntry");
+    var stop = el("duckStop");
+    var target = el("duckTarget");
+    var size = el("duckSize");
+    var sizeNote = el("duckSizeNote");
+    var headline = el("tradeDuckHeadline");
+    var explain = el("duckExplainText");
+
+    if (!plan) {
+      if (direction) direction.textContent = "—";
+      if (directionNote) directionNote.textContent = "Waiting for a trade setup";
+      if (entry) entry.textContent = "$—";
+      if (stop) stop.textContent = "$—";
+      if (target) target.textContent = "$—";
+      if (size) size.textContent = "—";
+      if (headline) headline.textContent = "Pick an asset and Portfolio AI will do the maths.";
+      if (explain) explain.textContent = "Keep your risk small. Portfolio AI will handle the numbers.";
+      return;
+    }
+
+    var dir = String(plan.direction || "WAIT").toUpperCase();
+    if (direction) direction.textContent = dir;
+    if (directionNote) directionNote.textContent = dir === "WAIT" ? "No clean setup yet" : "Portfolio AI trade direction";
+    if (entry) entry.textContent = safeMoney(plan.entry);
+    if (stop) stop.textContent = safeMoney(plan.stop);
+    if (target) target.textContent = safeMoney(plan.target);
+
+    try {
+      var display = positionSizeDisplay(plan);
+      if (size) size.textContent = display.primary || "—";
+      if (sizeNote) sizeNote.textContent = display.note || "Risk-based position size from your USD capital.";
+    } catch (e) {
+      if (size) size.textContent = plan.units ? String(plan.units) : "—";
+    }
+
+    if (headline) {
+      headline.textContent = dir === "WAIT"
+        ? "No trade yet — Portfolio AI says wait."
+        : dir + " setup ready. Follow the four numbers below.";
+    }
+
+    if (explain) {
+      if (dir === "WAIT") {
+        explain.textContent = "Doing nothing is also a decision. Wait until the setup is clearer.";
+      } else {
+        explain.textContent = "Enter near the entry price, exit at the stop if wrong, and take profit near the target if right.";
+      }
+    }
+  }
+
+  function updateCapitalSimpleAnswer() {
+    var d = capitalAdequacyData();
+    var h = el("capitalSimpleHeadline");
+    var c = el("capitalSimpleCopy");
+
+    if (!h || !c) return;
+
+    if (!d.capital || !d.count || !d.minimum) {
+      h.textContent = "Run the portfolio check";
+      c.textContent = "Portfolio AI will tell you the exact USD amount to add, not just a percentage.";
+      return;
+    }
+
+    if (d.capital >= d.minimum) {
+      var extraComfort = Math.max(0, d.comfortable - d.capital);
+      h.textContent = "Your $" + Math.round(d.capital).toLocaleString("en-US") + " is enough.";
+      c.textContent = extraComfort > 0
+        ? "You do not need to add more to make this portfolio practical. About $" + Math.round(extraComfort).toLocaleString("en-US") + " more would only give you extra breathing room."
+        : "You already have comfortable capital for this selected portfolio.";
+    } else {
+      var add = Math.max(0, d.minimum - d.capital);
+      h.textContent = "Add about $" + Math.round(add).toLocaleString("en-US") + " more.";
+      c.textContent = "That takes you from $" + Math.round(d.capital).toLocaleString("en-US") + " to about $" + Math.round(d.minimum).toLocaleString("en-US") + ", where this selected portfolio becomes more practical.";
+    }
+  }
+
+  function runPageEntrance(view) {
+    if (!view) return;
+    view.classList.remove("view-enter");
+    void view.offsetWidth;
+    view.classList.add("view-enter");
   }
 
   var APP_VIEW_STORAGE_KEY =
@@ -6797,6 +6905,8 @@
     attachMarketTicker();
     attachPremiumIntelligence();
   attachTradeBeginnerMode();
+  updateTradeDuckSummary();
+  updateCapitalSimpleAnswer();
     restoreAppView();
     restorePortfolioFrozen();
     setStatus("Ready", "ready");

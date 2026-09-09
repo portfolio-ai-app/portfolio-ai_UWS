@@ -12,6 +12,10 @@
   <script src="app.js" defer></script>
 </head>
 <body>
+  <div class="ambient-orb ambient-orb-a" aria-hidden="true"></div>
+  <div class="ambient-orb ambient-orb-b" aria-hidden="true"></div>
+  <div class="ambient-grid" aria-hidden="true"></div>
+
 
 <div class="app-shell v19-shell">
 <nav class="top-nav">
@@ -396,7 +400,14 @@
       <div class="capital-gauge-track"><i id="capitalGaugeFill"></i><b id="capitalGaugeMarker"></b></div>
     </div>
 
-    <div class="capital-check-grid">
+    
+    <div class="capital-simple-answer" id="capitalSimpleAnswer">
+      <span>PLAIN ENGLISH</span>
+      <strong id="capitalSimpleHeadline">Run the portfolio check</strong>
+      <p id="capitalSimpleCopy">Portfolio AI will tell you the exact USD amount to add, not just a percentage.</p>
+    </div>
+
+<div class="capital-check-grid">
       <article>
         <span>Portfolio AI range</span>
         <strong id="capitalRecommended">$—</strong>
@@ -542,7 +553,53 @@
       </button>
     </div>
 
-    <div class="trade-simple-flow">
+    
+    <section class="trade-duck-summary glass-surface" id="tradeDuckSummary">
+      <div class="trade-duck-top">
+        <div>
+          <span class="section-kicker">SIMPLE TRADE PLAN</span>
+          <h3 id="tradeDuckHeadline">Pick an asset and Portfolio AI will do the maths.</h3>
+          <p id="tradeDuckCopy">You only need to understand four things: where to enter, where to exit if wrong, where to take profit, and how much to buy.</p>
+        </div>
+        <div class="trade-duck-badge" id="tradeDuckBadge">BEGINNER MODE</div>
+      </div>
+
+      <div class="trade-duck-grid">
+        <article>
+          <span>BUY / SELL</span>
+          <strong id="duckDirection">—</strong>
+          <small id="duckDirectionNote">Waiting for a trade setup</small>
+        </article>
+        <article>
+          <span>ENTRY</span>
+          <strong id="duckEntry">$—</strong>
+          <small>Price to enter around</small>
+        </article>
+        <article>
+          <span>STOP LOSS</span>
+          <strong id="duckStop">$—</strong>
+          <small>Exit here if wrong</small>
+        </article>
+        <article>
+          <span>TAKE PROFIT</span>
+          <strong id="duckTarget">$—</strong>
+          <small>Target if the trade works</small>
+        </article>
+      </div>
+
+      <div class="trade-duck-size">
+        <span>HOW MUCH SHOULD I BUY?</span>
+        <strong id="duckSize">—</strong>
+        <p id="duckSizeNote">Portfolio AI will calculate a risk-based size from your USD capital.</p>
+      </div>
+
+      <div class="trade-duck-explain" id="duckExplain">
+        <strong>Simple rule:</strong>
+        <span id="duckExplainText">Keep your risk small. Portfolio AI will handle the numbers.</span>
+      </div>
+    </section>
+
+<div class="trade-simple-flow">
       <article class="trade-simple-step glass-surface">
         <span>1</span><div><strong>Choose an asset</strong><small>Select what you want to plan a trade for.</small></div>
       </article>
