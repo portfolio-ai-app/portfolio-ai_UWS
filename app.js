@@ -10,9 +10,7 @@
 
   var API_KEY = "3c2d42ab66f747fc902da8ae6c4e61f6";
   var API_BASE = "https://api.twelvedata.com";
-
-  var NEWSDATA_API_KEY = "pub_0eb8966ea9f248b49dff1a609b7a8782";
-  var NEWSDATA_MARKET_BASE = "https://newsdata.io/api/1/market";
+  var NEWS_SNAPSHOT_URL = "news.json";
 
   var CATALOG_ENDPOINTS = {
     Stocks: "/stocks",
@@ -108,15 +106,8 @@
 
   var activeNewsFilter = "portfolio";
   var newsLoading = false;
-  var newsCache = {};
-  var newsCacheTTL = 60 * 60 * 1000;
-  var newsStaleTTL = 24 * 60 * 60 * 1000;
-  var newsInFlight = {};
-  var newsCacheLoadedFromStorage = false;
-  var NEWS_CACHE_STORAGE_KEY = "portfolio_ai_news_cache_v2";
-  var NEWS_USAGE_STORAGE_KEY = "portfolio_ai_news_usage_v2";
-  var NEWS_DAILY_SOFT_LIMIT = 60;
-  var NEWS_FORCE_REFRESH_COOLDOWN = 5 * 60 * 1000;
+  var newsSnapshot = null;
+  var newsSnapshotPromise = null;
 
 
   function el(id) {
@@ -442,7 +433,7 @@
     if (activeNewsFilter !== "portfolio") return;
 
     setNewsProviderHint(
-      "Portfolio changed. Press Refresh if you want headlines for the updated selection.",
+      "For You follows a curated mix of major global market assets.",
       ""
     );
   }
@@ -5104,268 +5095,40 @@ function answerAIQuestion(question) {
   }
 
 
-  /* ========================= NEWSDATA.IO MARKET NEWS ========================= */
+  /* ========================= STATIC MARKET NEWS SNAPSHOT ========================= */
 
-  function newsDataRequest(parameters) {
-    parameters = parameters || {};
-
-    var params = new URLSearchParams();
-    var key;
-
-    params.set("apikey", NEWSDATA_API_KEY);
-    params.set("language", "en");
-
-    for (key in parameters) {
-      if (
-        Object.prototype.hasOwnProperty.call(parameters, key) &&
-        parameters[key] !== undefined &&
-        parameters[key] !== null &&
-        parameters[key] !== ""
-      ) {
-        params.set(key, parameters[key]);
-      }
-    }
-
-    var requestUrl =
-      NEWSDATA_MARKET_BASE +
-      "?" +
-      params.toString();
-
-    return fetch(requestUrl)
-      .then(function (response) {
-        return response.text()
-          .then(function (bodyText) {
-            var data;
-
-            try {
-              data = JSON.parse(bodyText);
-            } catch (parseError) {
-              var nonJsonError = new Error(
-                "NewsData returned a non-JSON response" +
-                (bodyText ? " · " + bodyText.slice(0, 220) : "")
-              );
-              nonJsonError.status = response.status;
-              nonJsonError.requestUrl = requestUrl;
-              throw nonJsonError;
-            }
-
-            if (!response.ok || !data || data.status === "error") {
-              var message =
-                data && (data.results && data.results.message)
-                  ? data.results.message
-                  : data && data.message
-                    ? data.message
-                    : "HTTP " + response.status;
-
-              var httpError = new Error("NewsData error · " + message);
-              httpError.status = response.status;
-              httpError.requestUrl = requestUrl;
-              httpError.responseData = data;
-              throw httpError;
-            }
-
-            if (!Array.isArray(data.results)) {
-              var shapeError = new Error(
-                "Unexpected NewsData response format."
-              );
-              shapeError.status = response.status;
-              shapeError.requestUrl = requestUrl;
-              shapeError.responseData = data;
-              throw shapeError;
-            }
-
-            return normalizeNewsDataResponse(data, requestUrl);
-          });
-      });
-  }
-
-  function normalizeNewsDataResponse(data, requestUrl) {
-    var normalized = {
-      articles: [],
-      totalResults: Number(data.totalResults || 0),
-      nextPage: data.nextPage || null,
-      __requestUrl: requestUrl,
-      __provider: "NewsData.io"
-    };
-
-    data.results.forEach(function (item) {
-      item = item || {};
-
-      normalized.articles.push({
-        title: item.title || "Financial market update",
-        url: item.link || "",
-        socialimage: item.image_url || "",
-        seendate: item.pubDate || item.pubDateTZ || "",
-        language: item.language || "English",
-        domain: item.source_id || item.source_name || "",
-        sourceName: item.source_name || item.source_id || "Financial news",
-        description: item.description || item.content || "",
-        sentiment: item.sentiment || ""
-      });
-    });
-
-    return normalized;
-  }
-
-  function cleanNewsSymbol(symbol) {
-    symbol = String(symbol || "");
-
-    if (symbol.indexOf("/") !== -1) {
-      return symbol.split("/")[0];
-    }
-
-    return symbol;
-  }
-
-  function cleanNewsQueryTerm(value) {
+  function cleanNewsText(value) {
     return String(value || "")
-      .replace(/[()\[\]{}]/g, " ")
-      .replace(/["']/g, "")
+      .replace(/[\r\n\t]+/g, " ")
       .replace(/\s+/g, " ")
       .trim();
   }
 
-  function shortenNewsQuery(value, maxLength) {
-    var text = cleanNewsQueryTerm(value);
-    var limit = maxLength || 90;
-
-    if (text.length <= limit) return text;
-
-    return text.slice(0, limit)
-      .replace(/\s+\S*$/, "")
-      .trim();
-  }
-
-  function newsAssetSearchTerms(asset) {
-    var terms = [];
-    var symbol = cleanNewsQueryTerm(asset.symbol || "");
-    var name = cleanNewsQueryTerm(asset.name || "");
-
-    if (asset.market === "Forex") {
-      var forexText = symbol.replace("/", " ");
-      if (forexText) terms.push(forexText);
-      return terms;
-    }
-
-    if (asset.market === "Crypto") {
-      var cryptoBase = symbol.split("/")[0];
-      if (name) terms.push(name);
-      else if (cryptoBase) terms.push(cryptoBase);
-      return terms;
-    }
-
-    if (asset.market === "Commodities") {
-      if (name) terms.push(name);
-      else if (symbol) terms.push(symbol);
-      return terms;
-    }
-
-    if (name) terms.push(name);
-    else if (symbol) terms.push(symbol);
-
-    return terms;
-  }
-
-  function buildPortfolioNewsQuery() {
-    var allTerms = [];
-    var seen = {};
-
-    selectedAssets
-      .slice(0, 4)
-      .forEach(function (asset) {
-        newsAssetSearchTerms(asset)
-          .slice(0, 1)
-          .forEach(function (term) {
-            var cleaned = cleanNewsQueryTerm(term);
-            var key = cleaned.toLowerCase();
-
-            if (cleaned && !seen[key]) {
-              seen[key] = true;
-              allTerms.push(cleaned);
-            }
-          });
-      });
-
-    if (!allTerms.length) {
-      return "financial markets";
-    }
-
-    return shortenNewsQuery(allTerms.join(" OR "), 90);
-  }
-
-  function buildNewsQuery(filter) {
-    if (filter === "portfolio") {
-      return buildPortfolioNewsQuery();
-    }
-
-    if (filter === "stocks") {
-      return "stock market";
-    }
-
-    if (filter === "crypto") {
-      return "cryptocurrency";
-    }
-
-    if (filter === "forex") {
-      return "forex";
-    }
-
-    if (filter === "commodities") {
-      return "commodities";
-    }
-
-    if (filter === "south-africa") {
-      return "South Africa markets";
-    }
-
-    return "financial markets";
-  }
-
-  function buildNewsParameters(filter) {
-    return {
-      q: shortenNewsQuery(buildNewsQuery(filter), 90),
-      sort: "relevancy"
-    };
-  }
-
   function parseNewsDate(value) {
-    if (!value) return new Date(NaN);
+    if (!value) return null;
 
-    var text = String(value || "").trim();
+    var date = new Date(value);
+    if (!isNaN(date.getTime())) return date;
 
-    if (/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(text)) {
-      text = text.replace(" ", "T") + "Z";
-    }
-
-    return new Date(text);
+    return null;
   }
 
   function formatNewsTime(value) {
-    if (!value) return "Latest";
-
     var date = parseNewsDate(value);
+    if (!date) return "Latest";
 
-    if (isNaN(date.getTime())) {
-      return "Latest";
-    }
+    var diff = Date.now() - date.getTime();
+    if (diff < 0) diff = 0;
 
-    var seconds = Math.max(
-      0,
-      Math.floor((Date.now() - date.getTime()) / 1000)
-    );
+    var minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return "Just now";
+    if (minutes < 60) return minutes + " min ago";
 
-    if (seconds < 60) return "Just now";
-    if (seconds < 3600) {
-      return Math.floor(seconds / 60) + "m ago";
-    }
+    var hours = Math.floor(minutes / 60);
+    if (hours < 24) return hours + " hr ago";
 
-    if (seconds < 86400) {
-      return Math.floor(seconds / 3600) + "h ago";
-    }
-
-    if (seconds < 604800) {
-      return Math.floor(seconds / 86400) + "d ago";
-    }
+    var days = Math.floor(hours / 24);
+    if (days < 7) return days + " day" + (days === 1 ? "" : "s") + " ago";
 
     return date.toLocaleDateString("en-US", {
       month: "short",
@@ -5373,58 +5136,73 @@ function answerAIQuestion(question) {
     });
   }
 
+  function formatSnapshotAge(value) {
+    var date = parseNewsDate(value);
+    if (!date) return "Latest available snapshot";
+
+    var diff = Math.max(0, Date.now() - date.getTime());
+    var minutes = Math.floor(diff / 60000);
+
+    if (minutes < 1) return "Updated just now";
+    if (minutes < 60) return "Updated " + minutes + " min ago";
+
+    var hours = Math.floor(minutes / 60);
+    if (hours < 24) return "Updated " + hours + " hr ago";
+
+    var days = Math.floor(hours / 24);
+    return "Updated " + days + " day" + (days === 1 ? "" : "s") + " ago";
+  }
+
   function articleSource(article) {
-    if (article.sourceName) {
-      return article.sourceName;
-    }
-
-    if (article.domain) {
-      return String(article.domain).replace(/^www\./, "");
-    }
-
-    try {
-      return new URL(article.url).hostname.replace("www.", "");
-    } catch (error) {
-      return "Financial news";
-    }
+    return cleanNewsText(
+      article.sourceName ||
+      article.domain ||
+      "Market news"
+    );
   }
 
   function scoreHeadlineSentiment(title) {
     var text = String(title || "").toLowerCase();
-
     var positiveWords = [
       "gain", "gains", "rise", "rises", "rally", "rallies", "surge",
-      "surges", "beat", "beats", "growth", "strong", "record high",
-      "upgrade", "upbeat", "profit", "profits", "bullish", "rebound",
-      "recovery"
+      "surges", "record", "beats", "beat", "growth", "higher", "up",
+      "bullish", "strong", "rebound", "recovery", "profit", "profits"
     ];
-
     var negativeWords = [
-      "fall", "falls", "drop", "drops", "plunge", "plunges", "loss",
-      "losses", "weak", "warning", "downgrade", "selloff", "sell-off",
-      "slump", "recession", "bearish", "miss", "misses", "risk", "crash"
+      "fall", "falls", "drop", "drops", "slump", "slumps", "loss",
+      "losses", "cuts", "cut", "lower", "down", "bearish", "weak",
+      "warning", "risk", "risks", "selloff", "sell-off", "decline",
+      "declines", "crash"
     ];
-
     var score = 0;
-    var i;
 
-    for (i = 0; i < positiveWords.length; i++) {
-      if (text.indexOf(positiveWords[i]) !== -1) score += 1;
-    }
+    positiveWords.forEach(function (word) {
+      if (text.indexOf(word) !== -1) score += 1;
+    });
 
-    for (i = 0; i < negativeWords.length; i++) {
-      if (text.indexOf(negativeWords[i]) !== -1) score -= 1;
-    }
+    negativeWords.forEach(function (word) {
+      if (text.indexOf(word) !== -1) score -= 1;
+    });
 
-    if (score > 0) {
-      return { label: "Positive tone", className: "positive", score: score };
-    }
+    if (score > 0) return { label: "Positive tone", className: "positive" };
+    if (score < 0) return { label: "Cautious tone", className: "negative" };
+    return { label: "Neutral tone", className: "neutral" };
+  }
 
-    if (score < 0) {
-      return { label: "Negative tone", className: "negative", score: score };
-    }
+  function normalizeSnapshotArticle(article) {
+    article = article || {};
 
-    return { label: "Neutral tone", className: "neutral", score: 0 };
+    return {
+      title: cleanNewsText(article.title || "Financial market update"),
+      url: article.url || article.link || "",
+      socialimage: article.socialimage || article.image_url || article.image || "",
+      seendate: article.seendate || article.pubDate || article.published_at || "",
+      language: String(article.language || "English"),
+      domain: article.domain || article.source_id || "",
+      sourceName: article.sourceName || article.source_name || article.source_id || "Market news",
+      description: cleanNewsText(article.description || article.content || ""),
+      sentiment: article.sentiment || ""
+    };
   }
 
   function renderNews(data) {
@@ -5433,22 +5211,21 @@ function answerAIQuestion(question) {
 
     if (!grid) return;
 
-    var articles =
-      data && Array.isArray(data.articles)
-        ? data.articles.filter(function (article) {
-            var language = String(article.language || "").toLowerCase();
-            return !language || language === "english" || language === "en";
-          }).slice(0, 6)
-        : [];
+    var articles = data && Array.isArray(data.articles)
+      ? data.articles.map(normalizeSnapshotArticle).filter(function (article) {
+          var language = String(article.language || "").toLowerCase();
+          return !language || language === "english" || language === "en";
+        }).slice(0, 6)
+      : [];
 
     if (!articles.length) {
       grid.innerHTML =
         '<div class="news-fallback-state">' +
-          '<strong>No matching headlines right now</strong>' +
-          '<p>Try another category later. No extra fallback API call will be made, which protects your daily news credits.</p>' +
+          '<strong>No matching headlines in the latest snapshot</strong>' +
+          '<p>The market-news snapshot will refresh automatically at the next scheduled update.</p>' +
         '</div>';
 
-      if (status) status.textContent = "No matching headlines returned";
+      if (status) status.textContent = "No matching headlines right now";
       return;
     }
 
@@ -5456,10 +5233,9 @@ function answerAIQuestion(question) {
     var i;
 
     for (i = 0; i < articles.length; i++) {
-      var article = articles[i] || {};
+      var article = articles[i];
       var featured = i === 0;
       var sentiment = scoreHeadlineSentiment(article.title);
-      var description = cleanNewsQueryTerm(article.description || "");
       var imageHtml;
 
       if (article.socialimage) {
@@ -5479,15 +5255,15 @@ function answerAIQuestion(question) {
               '<span class="news-source">' + escapeHTML(articleSource(article)) + '</span>' +
               '<span class="news-time">' + escapeHTML(formatNewsTime(article.seendate)) + '</span>' +
             '</div>' +
-            '<h3 class="news-title">' + escapeHTML(article.title || "Financial market update") + '</h3>' +
+            '<h3 class="news-title">' + escapeHTML(article.title) + '</h3>' +
             '<p class="news-description">' +
-              escapeHTML(description ? description.slice(0, 180) : "English financial market coverage") +
+              escapeHTML(article.description ? article.description.slice(0, 180) : "English financial market coverage") +
             '</p>' +
             '<div class="news-entity-row">' +
               '<span class="news-entity news-sentiment ' + sentiment.className + '">' +
                 escapeHTML(sentiment.label) +
               '</span>' +
-              '<span class="news-source-pill">NewsData.io</span>' +
+              '<span class="news-source-pill">Market News</span>' +
             '</div>' +
             (article.url
               ? '<a class="news-link" href="' + escapeHTML(article.url) + '" target="_blank" rel="noopener noreferrer">Read source <span>↗</span></a>'
@@ -5503,177 +5279,6 @@ function answerAIQuestion(question) {
     }
   }
 
-  function getNewsRequestKey(filter) {
-    return filter + "|" + buildNewsQuery(filter);
-  }
-
-  function getNewsCacheKey(filter) {
-    var key = filter;
-
-    if (filter === "portfolio") {
-      key += "|" +
-        selectedAssets
-          .map(function (asset) {
-            return cleanNewsSymbol(asset.symbol);
-          })
-          .filter(Boolean)
-          .sort()
-          .join(",");
-    }
-
-    return key;
-  }
-
-  function loadPersistentNewsCache() {
-    if (newsCacheLoadedFromStorage) return;
-    newsCacheLoadedFromStorage = true;
-
-    try {
-      var saved = localStorage.getItem(NEWS_CACHE_STORAGE_KEY);
-      if (!saved) return;
-
-      var parsed = JSON.parse(saved);
-      if (!parsed || typeof parsed !== "object") return;
-
-      var now = Date.now();
-      var key;
-
-      for (key in parsed) {
-        if (!Object.prototype.hasOwnProperty.call(parsed, key)) continue;
-
-        var entry = parsed[key];
-        if (!entry || !entry.fetchedAt || !entry.data) continue;
-
-        if (now - entry.fetchedAt <= newsStaleTTL) {
-          newsCache[key] = entry;
-        }
-      }
-    } catch (error) {
-      console.warn("Could not restore NewsData cache:", error);
-    }
-  }
-
-  function persistNewsCache() {
-    try {
-      var compact = {};
-      var key;
-      var now = Date.now();
-
-      for (key in newsCache) {
-        if (!Object.prototype.hasOwnProperty.call(newsCache, key)) continue;
-
-        var entry = newsCache[key];
-        if (!entry || !entry.fetchedAt || !entry.data) continue;
-
-        if (now - entry.fetchedAt <= newsStaleTTL) {
-          compact[key] = entry;
-        }
-      }
-
-      localStorage.setItem(NEWS_CACHE_STORAGE_KEY, JSON.stringify(compact));
-    } catch (error) {
-      console.warn("Could not persist NewsData cache:", error);
-    }
-  }
-
-  function getCachedNews(filter) {
-    loadPersistentNewsCache();
-
-    var entry = newsCache[getNewsCacheKey(filter)];
-    if (!entry) return null;
-
-    var age = Date.now() - entry.fetchedAt;
-
-    return {
-      data: entry.data,
-      fetchedAt: entry.fetchedAt,
-      fresh: age < newsCacheTTL,
-      staleUsable: age < newsStaleTTL
-    };
-  }
-
-  function setCachedNews(filter, data) {
-    newsCache[getNewsCacheKey(filter)] = {
-      data: data,
-      fetchedAt: Date.now()
-    };
-
-    persistNewsCache();
-  }
-
-  function newsCacheAge(timestamp) {
-    var seconds = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
-
-    if (seconds < 60) return "just now";
-
-    var minutes = Math.floor(seconds / 60);
-    if (minutes < 60) return minutes + " min ago";
-
-    return Math.floor(minutes / 60) + " hr ago";
-  }
-
-  function todayUsageKey() {
-    var now = new Date();
-    return [now.getFullYear(), now.getMonth() + 1, now.getDate()].join("-");
-  }
-
-  function getNewsUsage() {
-    try {
-      var parsed = JSON.parse(localStorage.getItem(NEWS_USAGE_STORAGE_KEY) || "{}");
-      if (!parsed || parsed.date !== todayUsageKey()) {
-        return { date: todayUsageKey(), count: 0, lastRequestAt: 0 };
-      }
-
-      return {
-        date: parsed.date,
-        count: Number(parsed.count || 0),
-        lastRequestAt: Number(parsed.lastRequestAt || 0)
-      };
-    } catch (error) {
-      return { date: todayUsageKey(), count: 0, lastRequestAt: 0 };
-    }
-  }
-
-  function recordNewsRequest() {
-    var usage = getNewsUsage();
-    usage.count += 1;
-    usage.lastRequestAt = Date.now();
-
-    try {
-      localStorage.setItem(NEWS_USAGE_STORAGE_KEY, JSON.stringify(usage));
-    } catch (error) {}
-
-    return usage;
-  }
-
-  function newsRequestAllowed(forceRefresh) {
-    var usage = getNewsUsage();
-
-    if (usage.count >= NEWS_DAILY_SOFT_LIMIT) {
-      return {
-        allowed: false,
-        reason: "Daily demo safety limit reached (" + NEWS_DAILY_SOFT_LIMIT + " calls)."
-      };
-    }
-
-    if (
-      forceRefresh &&
-      usage.lastRequestAt &&
-      Date.now() - usage.lastRequestAt < NEWS_FORCE_REFRESH_COOLDOWN
-    ) {
-      var waitSeconds = Math.ceil(
-        (NEWS_FORCE_REFRESH_COOLDOWN - (Date.now() - usage.lastRequestAt)) / 1000
-      );
-
-      return {
-        allowed: false,
-        reason: "Refresh protected for another " + waitSeconds + " seconds."
-      };
-    }
-
-    return { allowed: true, reason: "" };
-  }
-
   function setNewsProviderHint(text, state) {
     var hint = el("newsProviderHint");
     if (!hint) return;
@@ -5682,184 +5287,122 @@ function answerAIQuestion(question) {
     hint.className = "news-provider-hint" + (state ? " " + state : "");
   }
 
-  function renderNewsDiagnostic(error) {
-    var grid = el("newsGrid");
+  function getSnapshotCategory(filter) {
+    if (!newsSnapshot || !newsSnapshot.markets) return null;
 
-    if (!grid || !error) return;
+    var category = newsSnapshot.markets[filter];
+    if (!category && filter === "portfolio") category = newsSnapshot.markets.markets;
 
-    var message = error.message || "Unknown news service error.";
-    var diagnostic = document.createElement("div");
+    if (Array.isArray(category)) {
+      return { articles: category };
+    }
 
-    diagnostic.className = "news-diagnostic";
-    diagnostic.innerHTML =
-      '<strong>News diagnostic:</strong> ' + escapeHTML(message);
+    if (category && Array.isArray(category.articles)) {
+      return category;
+    }
 
-    grid.appendChild(diagnostic);
+    return { articles: [] };
   }
 
-  function renderNewsServiceFallback(cached, message) {
-    var grid = el("newsGrid");
-    var status = el("newsStatus");
+  function updateNewsContext(filter) {
+    var hint = el("newsPortfolioHint");
+    if (!hint) return;
 
-    if (cached && cached.data && cached.staleUsable !== false) {
-      renderNews(cached.data);
+    var labels = {
+      portfolio: "Major assets · Gold · Oil · Crypto · Indices",
+      markets: "Global financial markets",
+      stocks: "Major equities and indices",
+      crypto: "Bitcoin · Ethereum · Solana · XRP",
+      forex: "Dollar · Euro · Sterling · Yen · Rand",
+      commodities: "Gold · Silver · Brent · WTI",
+      "south-africa": "South Africa · JSE · Rand"
+    };
 
-      if (status) {
-        status.textContent = "Cached · " + newsCacheAge(cached.fetchedAt);
-      }
+    hint.textContent = labels[filter] || "Global market news";
+  }
 
-      setNewsProviderHint(
-        "NewsData was not called again. Previously cached headlines are being shown to protect your API credits.",
-        "limited"
-      );
-      return;
-    }
+  function renderActiveNewsCategory() {
+    var data = getSnapshotCategory(activeNewsFilter);
+    renderNews(data);
+    updateNewsContext(activeNewsFilter);
 
-    if (grid) {
-      grid.innerHTML =
-        '<div class="news-fallback-state">' +
-          '<strong>Headlines temporarily unavailable</strong>' +
-          '<p>' +
-            escapeHTML(message || "The external news service could not be reached.") +
-            ' No fallback request was sent, so no additional NewsData credit was used.' +
-          '</p>' +
-        '</div>';
-    }
-
-    if (status) status.textContent = "News temporarily unavailable";
-
+    var updated = newsSnapshot && newsSnapshot.updated_at;
     setNewsProviderHint(
-      "The News Hub stopped safely without making a second API call.",
-      "limited"
+      formatSnapshotAge(updated) + " · shared market-news snapshot",
+      "cached"
     );
   }
 
   function loadNews(forceRefresh) {
-    var filter = activeNewsFilter;
-    var requestKey = getNewsRequestKey(filter);
-    var cached = getCachedNews(filter);
     var grid = el("newsGrid");
     var status = el("newsStatus");
-    var hint = el("newsPortfolioHint");
     var refresh = el("newsRefresh");
 
-    if (!forceRefresh && cached && cached.fresh) {
-      renderNews(cached.data);
-
-      if (status) {
-        status.textContent = "Cached · " + newsCacheAge(cached.fetchedAt);
-      }
-
-      setNewsProviderHint(
-        "Showing saved headlines. No NewsData credit was used.",
-        "cached"
-      );
-
+    if (newsSnapshot && !forceRefresh) {
+      renderActiveNewsCategory();
       return Promise.resolve(true);
     }
 
-    if (newsInFlight[requestKey]) {
-      if (status) status.textContent = "News request already in progress…";
-
-      setNewsProviderHint(
-        "Duplicate request blocked. No extra credit will be used.",
-        "cached"
-      );
-
-      return newsInFlight[requestKey];
-    }
-
-    var allowance = newsRequestAllowed(forceRefresh);
-
-    if (!allowance.allowed) {
-      renderNewsServiceFallback(cached, allowance.reason);
-      return Promise.resolve(false);
-    }
+    if (newsSnapshotPromise) return newsSnapshotPromise;
 
     if (refresh) refresh.disabled = true;
+    if (status) status.textContent = forceRefresh ? "Checking for newer headlines…" : "Loading market headlines…";
 
-    if (grid) {
+    if (grid && !newsSnapshot) {
       grid.innerHTML =
-        '<div class="catalog-loader">' +
-          '<span></span>' +
-          '<p>Loading financial news…</p>' +
-        '</div>';
+        '<div class="catalog-loader"><span></span><p>Loading financial news…</p></div>';
     }
 
-    if (status) {
-      status.textContent = forceRefresh
-        ? "Refreshing headlines…"
-        : "Loading market headlines…";
-    }
+    var url = NEWS_SNAPSHOT_URL + (forceRefresh ? "?v=" + Date.now() : "");
 
-    if (hint) {
-      if (filter === "portfolio" && selectedAssets.length) {
-        hint.textContent =
-          "Following " +
-          selectedAssets
-            .slice(0, 4)
-            .map(function (asset) { return asset.symbol; })
-            .join(" · ");
-      } else if (filter === "portfolio") {
-        hint.textContent = "No assets selected · showing general markets";
-      } else {
-        hint.textContent = "English market news via NewsData.io";
-      }
-    }
+    newsSnapshotPromise = fetch(url, { cache: forceRefresh ? "no-store" : "default" })
+      .then(function (response) {
+        if (!response.ok) {
+          throw new Error("Market news snapshot returned HTTP " + response.status + ".");
+        }
+        return response.json();
+      })
+      .then(function (data) {
+        if (!data || !data.markets) {
+          throw new Error("Market news snapshot is not ready yet.");
+        }
 
-    var usageBefore = getNewsUsage();
-    setNewsProviderHint(
-      "NewsData request " + (usageBefore.count + 1) + " of " + NEWS_DAILY_SOFT_LIMIT + " allowed by this demo today.",
-      ""
-    );
+        newsSnapshot = data;
+        renderActiveNewsCategory();
+        return true;
+      })
+      .catch(function (error) {
+        console.error("Static market-news error:", error);
 
-    recordNewsRequest();
+        if (newsSnapshot) {
+          renderActiveNewsCategory();
+          setNewsProviderHint("Showing the latest available market-news snapshot.", "limited");
+          return false;
+        }
 
-    function finishRequest(result) {
-      delete newsInFlight[requestKey];
-      if (refresh) refresh.disabled = false;
-      return result;
-    }
+        if (grid) {
+          grid.innerHTML =
+            '<div class="news-fallback-state">' +
+              '<strong>Market news is preparing</strong>' +
+              '<p>The first scheduled snapshot has not been published yet. Market prices and the rest of Portfolio AI remain available.</p>' +
+            '</div>';
+        }
 
-    function handleSuccess(data) {
-      setCachedNews(filter, data);
-      renderNews(data);
+        if (status) status.textContent = "News snapshot unavailable";
+        setNewsProviderHint("Market news will appear after the next scheduled snapshot.", "limited");
+        return false;
+      })
+      .then(function (result) {
+        newsSnapshotPromise = null;
+        if (refresh) refresh.disabled = false;
+        return result;
+      }, function (error) {
+        newsSnapshotPromise = null;
+        if (refresh) refresh.disabled = false;
+        throw error;
+      });
 
-      if (status) status.textContent = "Updated just now";
-
-      var usage = getNewsUsage();
-      setNewsProviderHint(
-        "English headlines cached for 60 minutes · " +
-        usage.count + " / " + NEWS_DAILY_SOFT_LIMIT +
-        " demo news calls used today.",
-        "provider-ok"
-      );
-
-      return true;
-    }
-
-    function handleFailure(error) {
-      console.error("NewsData.io news error:", error);
-
-      renderNewsServiceFallback(
-        cached,
-        error && error.message
-          ? error.message
-          : "NewsData.io could not be reached."
-      );
-
-      renderNewsDiagnostic(error);
-      return false;
-    }
-
-    var requestPromise =
-      newsDataRequest(buildNewsParameters(filter))
-        .then(handleSuccess)
-        .catch(handleFailure)
-        .then(finishRequest);
-
-    newsInFlight[requestKey] = requestPromise;
-    return requestPromise;
+    return newsSnapshotPromise;
   }
 
   function setNewsFilter(filter) {
@@ -5875,9 +5418,14 @@ function answerAIQuestion(question) {
       );
     }
 
-    loadNews(false);
-  }
+    updateNewsContext(filter);
 
+    if (newsSnapshot) {
+      renderActiveNewsCategory();
+    } else {
+      loadNews(false);
+    }
+  }
 
   /* ========================= EVENTS ========================= */
 
@@ -7311,7 +6859,7 @@ function attachAppNavigation() {
 
         if (activeNewsFilter === "portfolio") {
           setNewsProviderHint(
-            "Portfolio changed. Press Refresh if you want headlines for the updated selection.",
+            "For You follows a curated mix of major global market assets.",
             ""
           );
         }
@@ -7454,8 +7002,8 @@ function attachAppNavigation() {
     renderPopularAssets();
     renderAssetGrid();
 
-    if (!window.__PORTFOLIO_AI_NEWSDATA_NEWS_BOOTED_V200__) {
-      window.__PORTFOLIO_AI_NEWSDATA_NEWS_BOOTED_V200__ = true;
+    if (!window.__PORTFOLIO_AI_STATIC_NEWS_BOOTED_V300__) {
+      window.__PORTFOLIO_AI_STATIC_NEWS_BOOTED_V300__ = true;
 
       runWhenIdle(function () {
         loadNews(false);

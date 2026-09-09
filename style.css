@@ -5846,3 +5846,7 @@ body:before{
     inset: auto -35% -45% 35%;
   }
 }
+
+
+/* Static market-news snapshot states */
+.news-provider-hint.cached::before{content:"";display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--green);vertical-align:1px}.news-provider-hint.limited::before{content:"";display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--orange);vertical-align:1px}

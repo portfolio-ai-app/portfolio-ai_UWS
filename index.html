@@ -104,8 +104,8 @@
   </header>
   <section class="glass-card news-hub-card apple-section">
 <div class="section-header news-heading">
-<div><span class="section-kicker">HEADLINE · MARKET CONTEXT</span><h2>What’s moving the market?</h2><p>English market headlines are prioritised, cached and deduplicated so the dashboard stays useful without wasting NewsData credits.</p></div>
-<button aria-label="Refresh news" class="icon-button" id="newsRefresh" title="Refresh news" type="button">↻</button>
+<div><span class="section-kicker">HEADLINE · MARKET CONTEXT</span><h2>What’s moving the market?</h2><p>Major market headlines are refreshed throughout the day and served from a shared market-news snapshot.</p></div>
+<button aria-label="Reload market news" class="icon-button" id="newsRefresh" title="Reload latest news snapshot" type="button">↻</button>
 </div>
 <div aria-label="Financial news categories" class="news-tabs" role="tablist">
 <button class="news-tab active" data-news-filter="portfolio" type="button">For You</button>
@@ -116,8 +116,8 @@
 <button class="news-tab" data-news-filter="commodities" type="button">Commodities</button>
 <button class="news-tab" data-news-filter="south-africa" type="button">South Africa</button>
 </div>
-<div class="news-meta"><span id="newsStatus">Loading latest financial headlines…</span><span id="newsPortfolioHint">For You follows your selected assets</span></div>
-<div class="news-provider-hint" id="newsProviderHint">Headlines are cached and deduplicated for speed. Refresh only when you explicitly want a new news request.</div>
+<div class="news-meta"><span id="newsStatus">Loading latest financial headlines…</span><span id="newsPortfolioHint">For You follows major market assets</span></div>
+<div class="news-provider-hint" id="newsProviderHint">Market news refreshes automatically throughout the day. The reload button only checks for the latest published snapshot.</div>
 <div class="news-grid" id="newsGrid"><div class="catalog-loader"><span></span><p>Loading financial news…</p></div></div>
 </section>
 </section>

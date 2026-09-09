@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "updated_at": null,
+  "provider": "NewsData.io",
+  "markets": {
+    "portfolio": {
+      "label": "Major Assets",
+      "articles": []
+    },
+    "markets": {
+      "label": "Markets",
+      "articles": []
+    },
+    "stocks": {
+      "label": "Stocks",
+      "articles": []
+    },
+    "crypto": {
+      "label": "Crypto",
+      "articles": []
+    },
+    "forex": {
+      "label": "Forex",
+      "articles": []
+    },
+    "commodities": {
+      "label": "Commodities",
+      "articles": []
+    },
+    "south-africa": {
+      "label": "South Africa",
+      "articles": []
+    }
+  }
+}
