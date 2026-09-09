@@ -350,7 +350,34 @@
     </div>
     <button type="button" class="view-header-action" data-open-view="portfolio">Edit portfolio</button>
   </header>
-  <section class="glass-card ai-advisor-card apple-section">
+  <section class="premium-intelligence" id="premiumIntelligence">
+  <div class="premium-intelligence-top">
+    <div><span class="section-kicker">PORTFOLIO OUTLOOK</span>
+      <div class="premium-outlook-line"><strong id="premiumOutlook">WAIT</strong><span id="premiumConfidence">— confidence</span></div>
+      <p id="premiumBrief">Run an analysis and Portfolio AI will summarize the outlook, confidence and key risk here.</p>
+    </div>
+    <div class="premium-score-ring"><span>FORECAST</span><strong id="premiumScore">—</strong><small>/100</small></div>
+  </div>
+  <div class="premium-horizon"><span>Horizon</span><div class="premium-segmented">
+    <button type="button" data-premium-horizon="1D">1D</button><button type="button" data-premium-horizon="1W">1W</button>
+    <button type="button" data-premium-horizon="1M">1M</button><button type="button" class="active" data-premium-horizon="3M">3M</button>
+    <button type="button" data-premium-horizon="6M">6M</button><button type="button" data-premium-horizon="1Y">1Y</button>
+  </div></div>
+  <div class="premium-snapshot-grid">
+    <article><span>Best opportunity</span><strong id="premiumBestAsset">—</strong><small id="premiumBestAssetNote">Waiting for analysis</small></article>
+    <article><span>Highest uncertainty</span><strong id="premiumRiskAsset">—</strong><small>Current volatility leader</small></article>
+    <article><span>Expected outcome</span><strong id="premiumExpected">—</strong><small id="premiumExpectedNote">Selected horizon</small></article>
+  </div>
+  <div class="premium-actions">
+    <button type="button" data-premium-panel="why">Why this outlook?</button><button type="button" data-premium-panel="scenarios">Scenarios</button>
+    <button type="button" data-premium-panel="risk">Risk radar</button><button type="button" data-premium-panel="whatif">Stress test</button>
+  </div>
+  <div class="premium-detail-panel" id="premiumDetailPanel" hidden>
+    <div class="premium-detail-head"><div><span class="section-kicker">DETAIL</span><h3 id="premiumDetailTitle">Detail</h3></div><button type="button" id="premiumDetailClose">×</button></div>
+    <div id="premiumDetailBody"></div>
+  </div>
+</section>
+<section class="glass-card ai-advisor-card apple-section">
 <div class="section-header compact ai-advisor-header">
 <div>
 <span class="section-kicker">PORTFOLIO AI</span>

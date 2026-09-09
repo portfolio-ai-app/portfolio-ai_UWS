@@ -2920,6 +2920,7 @@
 
           setStatus("Analysis complete", "success");
           updateOverview();
+          updatePremiumIntelligence();
           setAppView("intelligence");
         } catch (error) {
           console.error(error);
@@ -5689,6 +5690,98 @@
       currentTheme;
   }
 
+
+  var premiumForecastHorizon = "3M";
+
+  function premiumClamp(v,a,b){return Math.max(a,Math.min(b,v));}
+
+  function premiumData(){
+    var s=buildAIState();
+    if(!s){return null;}
+    var a=s.analyses||[];
+    var rows=a.map(function(x){
+      var c=Number(x.signal.confidence)||50;
+      var sc=x.signal.label==="Bullish"?50+c*.5:x.signal.label==="Bearish"?50-c*.5:50+(c-50)*.12;
+      return {item:x,score:premiumClamp(sc,4,96)};
+    });
+    rows.sort(function(a,b){return b.score-a.score;});
+    var vr=a.slice().sort(function(a,b){return (Number(b.analysis.volatility)||0)-(Number(a.analysis.volatility)||0);});
+    var score=rows.length?rows.reduce(function(t,r){return t+r.score;},0)/rows.length:50;
+    var conf=a.length?a.reduce(function(t,r){return t+(Number(r.signal.confidence)||50);},0)/a.length:0;
+    return {state:s,rows:rows,best:rows.length?rows[0].item:null,risk:vr.length?vr[0]:null,score:Math.round(score),confidence:Math.round(conf)};
+  }
+
+  function premiumFactor(){
+    return {"1D":.04,"1W":.12,"1M":.34,"3M":1,"6M":1.45,"1Y":2.05}[premiumForecastHorizon]||1;
+  }
+
+  function premiumOutcome(){
+    if(!portfolioResults){return null;}
+    var inv=Number(el("investment")?el("investment").value:0), med=Number(portfolioResults.median);
+    if(!isFinite(inv)||inv<=0||!isFinite(med)){return null;}
+    return ((med-inv)/inv)*premiumFactor();
+  }
+
+  function updatePremiumIntelligence(){
+    var d=premiumData(), o=el("premiumOutlook"),c=el("premiumConfidence"),sc=el("premiumScore"),b=el("premiumBrief"),
+        ba=el("premiumBestAsset"),bn=el("premiumBestAssetNote"),ra=el("premiumRiskAsset"),ex=el("premiumExpected"),en=el("premiumExpectedNote");
+    if(!d){
+      if(o)o.textContent="WAIT"; if(c)c.textContent="— confidence"; if(sc)sc.textContent="—";
+      if(b)b.textContent="Run an analysis and Portfolio AI will summarize the outlook, confidence and key risk here.";
+      if(ba)ba.textContent="—"; if(ra)ra.textContent="—"; if(ex)ex.textContent="—"; return;
+    }
+    if(o)o.textContent=d.state.verdict||"SELECTIVE";
+    if(c)c.textContent=d.confidence+"% confidence";
+    if(sc)sc.textContent=String(d.score);
+    if(ba)ba.textContent=d.best?d.best.asset.symbol:"—";
+    if(bn)bn.textContent=d.best?d.best.signal.label+" · "+Math.round(d.best.signal.confidence)+"% confidence":"Waiting";
+    if(ra)ra.textContent=d.risk?d.risk.asset.symbol:"—";
+    var p=premiumOutcome();
+    if(ex)ex.textContent=p===null?"—":(p>=0?"+":"")+(p*100).toFixed(1)+"%";
+    if(en)en.textContent=premiumForecastHorizon+" scenario · current simulation";
+    if(b){
+      var text="The portfolio currently has a "+String(d.state.verdict||"selective").toLowerCase()+" posture.";
+      if(d.best)text+=" "+d.best.asset.symbol+" has the strongest current quantitative setup.";
+      if(d.risk&&(!d.best||d.risk.asset.symbol!==d.best.asset.symbol))text+=" "+d.risk.asset.symbol+" contributes the most volatility.";
+      b.textContent=text;
+    }
+  }
+
+  function premiumPanel(type){
+    var d=premiumData();
+    if(!d)return '<div class="premium-empty-detail"><strong>Analysis required</strong><p>Load market data and run the analysis first.</p></div>';
+    if(type==="why"){
+      var h='<div class="premium-reason-list">';
+      d.rows.forEach(function(r){h+='<div class="premium-reason-row"><div><strong>'+escapeHTML(r.item.asset.symbol)+'</strong><small>'+escapeHTML(r.item.signal.label)+'</small></div><span>'+Math.round(r.score)+'/100</span></div>';});
+      return h+'</div><div class="premium-callout"><strong>What could change the outlook</strong><p>A reversal in trend, momentum or volatility would reduce confidence in the current posture.</p></div>';
+    }
+    if(type==="scenarios"){
+      var p=premiumOutcome()||0, spread=Math.max(.035,Math.abs(p)*.75);
+      return '<div class="premium-scenario-grid"><article><span>UPSIDE</span><strong>'+((p+spread)>=0?"+":"")+((p+spread)*100).toFixed(1)+'%</strong><small>Optimistic range</small></article><article class="base"><span>EXPECTED</span><strong>'+(p>=0?"+":"")+(p*100).toFixed(1)+'%</strong><small>Median scenario</small></article><article><span>DOWNSIDE</span><strong>'+((p-spread)>=0?"+":"")+((p-spread)*100).toFixed(1)+'%</strong><small>Adverse range</small></article></div><p class="premium-method-note">Illustrative quantitative scenarios, not guaranteed price targets.</p>';
+    }
+    if(type==="risk"){
+      var vol=d.risk?premiumClamp((Number(d.risk.analysis.volatility)||.4)*100,12,95):40;
+      var vals=[["Concentration",premiumClamp(30+selectedAssets.length*9,20,88)],["Volatility",vol],["Forecast uncertainty",premiumClamp(100-d.confidence,10,90)],["Risk flags",premiumClamp(22+(d.state.warnings?d.state.warnings.length:0)*18,15,95)]];
+      var h='<div class="premium-risk-list">';
+      vals.forEach(function(x){h+='<div class="premium-risk-row"><div><span>'+x[0]+'</span><strong>'+Math.round(x[1])+'</strong></div><div class="premium-risk-track"><i style="width:'+Math.round(x[1])+'%"></i></div></div>';});
+      return h+'</div>';
+    }
+    return '<div class="premium-stress-intro"><strong>Quick stress test</strong><p>Choose a market shock for an approximate equal-weight portfolio impact.</p></div><div class="premium-stress-presets"><button class="premium-stress-preset" data-stress-value="-10">Nasdaq −10%</button><button class="premium-stress-preset" data-stress-value="-15">Bitcoin −15%</button><button class="premium-stress-preset" data-stress-value="10">Gold +10%</button><button class="premium-stress-preset" data-stress-value="8">USD/ZAR +8%</button></div><div id="premiumStressResult" class="premium-stress-result">Select a scenario.</div>';
+  }
+
+  function attachPremiumIntelligence(){
+    document.addEventListener("click",function(e){
+      var h=e.target.closest("[data-premium-horizon]");
+      if(h){premiumForecastHorizon=h.getAttribute("data-premium-horizon")||"3M";Array.prototype.forEach.call(document.querySelectorAll("[data-premium-horizon]"),function(x){x.classList.toggle("active",x===h);});updatePremiumIntelligence();return;}
+      var p=e.target.closest("[data-premium-panel]");
+      if(p){var panel=el("premiumDetailPanel"),title=el("premiumDetailTitle"),body=el("premiumDetailBody");if(panel&&body){var t=p.getAttribute("data-premium-panel");title.textContent={why:"Why this outlook?",scenarios:"Forecast scenarios",risk:"Portfolio risk radar",whatif:"What-if simulator"}[t]||"Detail";body.innerHTML=premiumPanel(t);panel.hidden=false;}return;}
+      if(e.target.closest("#premiumDetailClose")){var panel=el("premiumDetailPanel");if(panel)panel.hidden=true;return;}
+      var s=e.target.closest("[data-stress-value]");
+      if(s){var r=el("premiumStressResult"),shock=Number(s.getAttribute("data-stress-value")),impact=selectedAssets.length?shock/selectedAssets.length:0;if(r)r.innerHTML='<span>Approx. portfolio impact</span><strong>'+(impact>=0?"+":"")+impact.toFixed(1)+'%</strong><small>Equal-weight sensitivity estimate</small>';}
+    });
+    updatePremiumIntelligence();
+  }
+
   var APP_VIEW_STORAGE_KEY =
     "portfolio-ai-active-view";
 
@@ -6454,6 +6547,7 @@
     attachAppleUX();
     attachAppNavigation();
     attachMarketTicker();
+    attachPremiumIntelligence();
     restoreAppView();
     restorePortfolioFrozen();
     setStatus("Ready", "ready");
