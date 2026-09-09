@@ -3903,3 +3903,76 @@ footer{color:var(--apple-secondary)}
   background:#f5f5f7;
   color:#6e6e73;
 }
+
+
+/* =========================================================
+   V21.3 — TICKER FIT / CLIPPING FIX
+   Let TradingView use its own intrinsic ticker height.
+========================================================= */
+
+.market-pulse-tape{
+  height:auto!important;
+  min-height:42px!important;
+  overflow:hidden;
+}
+
+.market-pulse-widget{
+  width:100%;
+  height:auto!important;
+  min-height:42px!important;
+  overflow:hidden;
+}
+
+.market-pulse-widget .tradingview-widget-container__widget{
+  width:100%;
+  height:auto!important;
+  min-height:42px!important;
+}
+
+.market-pulse-widget iframe{
+  display:block!important;
+  width:100%!important;
+  height:auto!important;
+  min-height:42px!important;
+  border:0!important;
+}
+
+/* Keep the tape compact without cutting off TradingView's
+   second line if it decides a symbol needs it. */
+.market-pulse-shell{
+  overflow:visible;
+}
+
+.market-pulse-head{
+  min-height:30px;
+  padding-top:4px;
+  padding-bottom:4px;
+}
+
+/* Navigation position after compact header + auto-sized tape.
+   The ticker normally settles around 44–50px. */
+.app-navigation{
+  top:142px!important;
+}
+
+.portfolio-freeze-shell.is-frozen{
+  top:200px!important;
+}
+
+@media(max-width:700px){
+  .market-pulse-tape,
+  .market-pulse-widget,
+  .market-pulse-widget .tradingview-widget-container__widget,
+  .market-pulse-widget iframe{
+    height:auto!important;
+    min-height:42px!important;
+  }
+
+  .app-navigation{
+    top:140px!important;
+  }
+
+  .portfolio-freeze-shell.is-frozen{
+    top:194px!important;
+  }
+}

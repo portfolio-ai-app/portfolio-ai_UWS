@@ -5523,7 +5523,7 @@
       ],
       showSymbolLogo: true,
       isTransparent: false,
-      displayMode: "adaptive",
+      displayMode: "regular",
       theme:
         theme === "dark"
           ? "dark"
