@@ -5874,6 +5874,17 @@
     if (card) {
       card.setAttribute("data-capital-status", d.status.toLowerCase());
     }
+
+    var gaugeFill = el("capitalGaugeFill");
+    var gaugeMarker = el("capitalGaugeMarker");
+    var gaugePct = 0;
+
+    if (d.minimum > 0) {
+      gaugePct = premiumClamp((d.capital / d.minimum) * 66.6667, 3, 100);
+    }
+
+    if (gaugeFill) gaugeFill.style.width = gaugePct + "%";
+    if (gaugeMarker) gaugeMarker.style.left = gaugePct + "%";
   }
 
   function updatePremiumIntelligence(){
@@ -5899,6 +5910,24 @@
       if(d.best)text+=" "+d.best.asset.symbol+" has the strongest current quantitative setup.";
       if(d.risk&&(!d.best||d.risk.asset.symbol!==d.best.asset.symbol))text+=" "+d.risk.asset.symbol+" contributes the most volatility.";
       b.textContent=text;
+    }
+
+    var quality=el("premiumDataQuality");
+    if(quality){
+      quality.textContent=d.confidence>=75?"DATA QUALITY STRONG":d.confidence>=55?"DATA QUALITY MODERATE":"DATA QUALITY LIMITED";
+    }
+    var updated=el("premiumLastUpdated");
+    if(updated){
+      var now=new Date();
+      updated.textContent="UPDATED "+String(now.getHours()).padStart(2,"0")+":"+String(now.getMinutes()).padStart(2,"0");
+    }
+
+    var ring=document.querySelector(".premium-score-ring");
+    if(ring){
+      ring.style.setProperty("--score-angle",Math.round(d.score*3.6)+"deg");
+      ring.classList.remove("score-pulse");
+      void ring.offsetWidth;
+      ring.classList.add("score-pulse");
     }
   }
 
@@ -5926,6 +5955,20 @@
 
   function attachPremiumIntelligence(){
     document.addEventListener("click",function(e){
+      var tip=e.target.closest(".info-tip");
+      if(tip){
+        var existing=document.querySelector(".floating-info-tip");
+        if(existing) existing.remove();
+        var box=document.createElement("div");
+        box.className="floating-info-tip";
+        box.textContent=tip.getAttribute("data-tip")||"";
+        document.body.appendChild(box);
+        var rect=tip.getBoundingClientRect();
+        box.style.left=Math.min(rect.left,window.innerWidth-280)+"px";
+        box.style.top=(rect.bottom+8)+"px";
+        window.setTimeout(function(){if(box&&box.parentNode)box.remove();},5000);
+        return;
+      }
       var h=e.target.closest("[data-premium-horizon]");
       if(h){premiumForecastHorizon=h.getAttribute("data-premium-horizon")||"3M";Array.prototype.forEach.call(document.querySelectorAll("[data-premium-horizon]"),function(x){x.classList.toggle("active",x===h);});updatePremiumIntelligence();return;}
       var p=e.target.closest("[data-premium-panel]");

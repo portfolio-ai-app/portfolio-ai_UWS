@@ -351,8 +351,14 @@
     <button type="button" class="view-header-action" data-open-view="portfolio">Edit portfolio</button>
   </header>
   <section class="premium-intelligence" id="premiumIntelligence">
+  <div class="intelligence-status-strip">
+    <span><i class="status-dot"></i> QUANT MODEL</span>
+    <span>MONTE CARLO</span>
+    <span id="premiumDataQuality">DATA QUALITY —</span>
+    <span id="premiumLastUpdated">READY</span>
+  </div>
   <div class="premium-intelligence-top">
-    <div><span class="section-kicker">PORTFOLIO OUTLOOK</span>
+    <div><span class="section-kicker">PORTFOLIO OUTLOOK <button type="button" class="info-tip" data-tip="A quantitative summary of trend, momentum, volatility, correlation and simulation results.">i</button></span>
       <div class="premium-outlook-line"><strong id="premiumOutlook">WAIT</strong><span id="premiumConfidence">— confidence</span></div>
       <p id="premiumBrief">Run an analysis and Portfolio AI will summarize the outlook, confidence and key risk here.</p>
     </div>
@@ -371,7 +377,7 @@
   <section class="capital-check-card" id="capitalCheckCard">
     <div class="capital-check-head">
       <div>
-        <span class="section-kicker">CAPITAL ADEQUACY</span>
+        <span class="section-kicker">CAPITAL ADEQUACY <button type="button" class="info-tip" data-tip="Checks whether your USD capital is practical for the selected portfolio and current risk settings. It is not a broker minimum.">i</button></span>
         <div class="capital-status-line">
           <strong id="capitalStatus">WAITING</strong>
           <span id="capitalStatusBadge">Run analysis</span>
@@ -384,6 +390,11 @@
     </div>
 
     <p id="capitalMessage">Select assets and run the analysis to check whether your USD capital is practical for the portfolio you selected.</p>
+
+    <div class="capital-gauge" aria-label="Capital adequacy scale">
+      <div class="capital-gauge-labels"><span>INSUFFICIENT</span><span>LIMITED</span><span>SUFFICIENT</span></div>
+      <div class="capital-gauge-track"><i id="capitalGaugeFill"></i><b id="capitalGaugeMarker"></b></div>
+    </div>
 
     <div class="capital-check-grid">
       <article>
