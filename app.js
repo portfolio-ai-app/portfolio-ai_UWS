@@ -7778,3 +7778,42 @@ window.addEventListener("resize", function() {
 });
 
 window.setTimeout(ensureActiveNavVisible, 300);
+
+
+function updateAIQuestionPlaceholder() {
+  var input = document.getElementById("aiQuestion");
+  if (!input) return;
+
+  var count = selectedAssets && selectedAssets.length ? selectedAssets.length : 0;
+  var capital = capitalNumber("investment", 0);
+
+  if (!count) {
+    input.placeholder = "Select assets, then ask Portfolio AI…";
+    return;
+  }
+
+  if (capital > 0) {
+    input.placeholder = "Ask about your " + plainMoney(capital) + " portfolio…";
+    return;
+  }
+
+  input.placeholder = "Ask Portfolio AI about these " + count + " assets…";
+}
+
+window.addEventListener("load", function(){
+  setTimeout(updateAIQuestionPlaceholder, 350);
+});
+
+document.addEventListener("change", function(){
+  setTimeout(updateAIQuestionPlaceholder, 60);
+});
+
+document.addEventListener("click", function(event){
+  if (
+    event.target.closest("[data-asset]") ||
+    event.target.closest(".asset-option") ||
+    event.target.closest(".asset-chip")
+  ) {
+    setTimeout(updateAIQuestionPlaceholder, 100);
+  }
+});

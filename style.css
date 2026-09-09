@@ -5487,3 +5487,320 @@ body:before{
     line-height:1.62!important;
   }
 }
+
+
+/* =========================================================
+   V27 — PRODUCT REFINEMENT
+   Less dashboard bulk. More finished financial-app hierarchy.
+========================================================= */
+
+:root{
+  --v27-radius-lg:24px;
+  --v27-radius-md:18px;
+  --v27-gap:14px;
+}
+
+/* ----- Global rhythm ----- */
+.app-view{
+  animation-duration:.48s!important;
+}
+
+.app-view > section,
+.app-view > .section,
+.app-view > .card,
+.app-view > .panel{
+  scroll-margin-top:90px;
+}
+
+.card,
+.panel,
+.portfolio-card,
+.ai-card,
+.news-card{
+  border-radius:var(--v27-radius-lg)!important;
+}
+
+/* ----- Make data cards denser without making them cramped ----- */
+.metric-card,
+.kpi-card,
+.forecast-kpi,
+.stat-card,
+.summary-card{
+  min-height:0!important;
+  padding:20px!important;
+}
+
+.metric-card h3,
+.kpi-card h3,
+.forecast-kpi h3,
+.stat-card h3{
+  margin-bottom:7px!important;
+}
+
+.metric-card .value,
+.kpi-card .value,
+.forecast-kpi .value,
+.stat-card .value,
+.metric-value,
+.kpi-value{
+  line-height:1!important;
+  letter-spacing:-.035em!important;
+}
+
+/* Forecast cards were visually oversized on mobile. */
+.forecast-grid,
+.kpi-grid,
+.metrics-grid{
+  gap:12px!important;
+}
+
+/* ----- Signal cards: tighter and more scan-friendly ----- */
+.signal-card,
+.asset-signal,
+.ai-signal-card{
+  padding:17px 18px!important;
+  border-radius:20px!important;
+}
+
+.signal-card .progress,
+.asset-signal .progress,
+.ai-signal-card .progress{
+  margin-top:11px!important;
+}
+
+/* ----- AI becomes the product's brain, not another boxed widget ----- */
+#aiQuestionForm{
+  padding:6px!important;
+  border-radius:22px!important;
+  box-shadow:
+    0 14px 40px rgba(0,0,0,.10),
+    inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+
+#aiQuestion{
+  min-height:48px!important;
+  border-radius:17px!important;
+  padding:0 16px!important;
+  font-size:14px!important;
+  letter-spacing:-.01em!important;
+}
+
+#aiAskButton{
+  min-height:48px!important;
+  border-radius:17px!important;
+  font-weight:600!important;
+  letter-spacing:-.012em!important;
+}
+
+#aiAnswer,
+.ai-answer{
+  border-radius:20px!important;
+  padding:17px 18px!important;
+  line-height:1.58!important;
+  box-shadow:none!important;
+}
+
+/* Quick prompts should read as secondary controls. */
+.ai-quick-prompts,
+.quick-prompts{
+  gap:7px!important;
+}
+
+.ai-quick-prompts button,
+.quick-prompts button,
+[data-ai-prompt]{
+  min-height:34px!important;
+  padding:7px 12px!important;
+  border-radius:999px!important;
+  font-size:11px!important;
+  font-weight:550!important;
+  letter-spacing:-.01em!important;
+}
+
+/* ----- Reduce excessive card-on-card visual weight ----- */
+.card .card,
+.panel .card,
+.card .panel{
+  box-shadow:none!important;
+}
+
+/* ----- Premium Intelligence: hierarchy over decoration ----- */
+.premium-intelligence,
+#premiumIntelligence{
+  border-radius:26px!important;
+}
+
+#premiumOutlook,
+.premium-outlook{
+  letter-spacing:-.035em!important;
+}
+
+.premium-system-strip,
+.intelligence-system-strip{
+  opacity:.82;
+}
+
+/* ----- Mobile is where the biggest refinement is needed ----- */
+@media(max-width:700px){
+  :root{
+    --v27-radius-lg:21px;
+    --v27-radius-md:16px;
+  }
+
+  body{
+    overflow-x:hidden;
+  }
+
+  .app-view{
+    padding-left:10px!important;
+    padding-right:10px!important;
+  }
+
+  .card,
+  .panel,
+  .portfolio-card,
+  .ai-card,
+  .news-card{
+    border-radius:21px!important;
+  }
+
+  /* Compress large vertical cards */
+  .metric-card,
+  .kpi-card,
+  .forecast-kpi,
+  .stat-card,
+  .summary-card{
+    padding:17px!important;
+    min-height:132px!important;
+  }
+
+  .forecast-grid,
+  .kpi-grid,
+  .metrics-grid{
+    gap:10px!important;
+  }
+
+  /* Forecast values stay prominent without taking half a screen */
+  .metric-card .value,
+  .kpi-card .value,
+  .forecast-kpi .value,
+  .stat-card .value,
+  .metric-value,
+  .kpi-value{
+    font-size:clamp(28px,8.5vw,40px)!important;
+  }
+
+  /* Asset analysis cards */
+  .signal-card,
+  .asset-signal,
+  .ai-signal-card{
+    padding:14px 15px!important;
+    border-radius:18px!important;
+  }
+
+  /* AI heading block */
+  #aiQuestionForm{
+    padding:5px!important;
+    border-radius:20px!important;
+  }
+
+  #aiQuestion{
+    min-height:46px!important;
+    font-size:13px!important;
+    padding:0 14px!important;
+  }
+
+  #aiAskButton{
+    min-height:46px!important;
+    font-size:13px!important;
+  }
+
+  #aiAnswer,
+  .ai-answer{
+    padding:15px!important;
+    border-radius:18px!important;
+    font-size:13px!important;
+    line-height:1.58!important;
+  }
+
+  /* Keep quick questions useful but stop them dominating width/height */
+  .ai-quick-prompts,
+  .quick-prompts{
+    display:flex!important;
+    flex-wrap:nowrap!important;
+    overflow-x:auto!important;
+    scrollbar-width:none!important;
+    -webkit-overflow-scrolling:touch;
+    padding-bottom:2px;
+  }
+
+  .ai-quick-prompts::-webkit-scrollbar,
+  .quick-prompts::-webkit-scrollbar{
+    display:none;
+  }
+
+  .ai-quick-prompts button,
+  .quick-prompts button,
+  [data-ai-prompt]{
+    flex:0 0 auto!important;
+    min-height:32px!important;
+    padding:6px 11px!important;
+    font-size:10px!important;
+  }
+
+  /* Navigation stays compact and visible */
+  .app-navigation{
+    margin-bottom:10px!important;
+  }
+
+  /* Less dead air between major sections */
+  .app-view section{
+    margin-bottom:14px!important;
+  }
+}
+
+/* ----- Very small phones ----- */
+@media(max-width:390px){
+  .app-view{
+    padding-left:7px!important;
+    padding-right:7px!important;
+  }
+
+  .metric-card,
+  .kpi-card,
+  .forecast-kpi,
+  .stat-card,
+  .summary-card{
+    padding:15px!important;
+    min-height:122px!important;
+  }
+
+  #aiAnswer,
+  .ai-answer{
+    padding:14px!important;
+  }
+}
+
+/* ----- Motion: restrained product feel ----- */
+@media(prefers-reduced-motion:no-preference){
+  .card,
+  .panel,
+  .signal-card,
+  .metric-card,
+  .kpi-card,
+  .forecast-kpi{
+    transition:
+      transform .28s cubic-bezier(.2,.8,.2,1),
+      border-color .28s ease,
+      box-shadow .28s ease!important;
+  }
+
+  @media(hover:hover){
+    .signal-card:hover,
+    .metric-card:hover,
+    .kpi-card:hover,
+    .forecast-kpi:hover{
+      transform:translateY(-2px);
+    }
+  }
+}
