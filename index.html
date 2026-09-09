@@ -9,7 +9,6 @@
   <title>Portfolio AI — Market Intelligence</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
-  <script type="module" src="https://www.tradingview-widget.com/w/en/tv-ticker-tape.js"></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -56,13 +55,10 @@
   <div class="market-pulse-tape">
     <div class="market-pulse-edge market-pulse-edge-left" aria-hidden="true"></div>
 
-    <tv-ticker-tape
-      id="portfolioTradingViewTicker"
-      symbols="SP:SPX,NASDAQ:IXIC,NASDAQ:AAPL,BITSTAMP:BTCUSD,FX:EURUSD,OANDA:XAUUSD,FX:USDZAR"
-      item-size="compact"
-      theme="light"
-      locale="en"
-    ></tv-ticker-tape>
+    <div id="portfolioTradingViewTicker" class="tradingview-widget-container market-pulse-widget">
+      <div class="tradingview-widget-container__widget"></div>
+      <div class="market-pulse-placeholder">Loading live market prices…</div>
+    </div>
 
     <div class="market-pulse-edge market-pulse-edge-right" aria-hidden="true"></div>
   </div>

@@ -5487,28 +5487,159 @@
 
 
 
-  function syncTradingViewTickerTheme(theme) {
-    var ticker =
-      el("portfolioTradingViewTicker");
+  var tradingViewTickerTheme = "";
 
-    if (!ticker) {
+  function tradingViewTickerConfig(theme) {
+    return {
+      symbols: [
+        {
+          proName: "SP:SPX",
+          title: "S&P 500"
+        },
+        {
+          proName: "NASDAQ:NDX",
+          title: "Nasdaq 100"
+        },
+        {
+          proName: "NASDAQ:AAPL",
+          title: "Apple"
+        },
+        {
+          proName: "BITSTAMP:BTCUSD",
+          title: "Bitcoin"
+        },
+        {
+          proName: "FX_IDC:EURUSD",
+          title: "EUR / USD"
+        },
+        {
+          proName: "OANDA:XAUUSD",
+          title: "Gold"
+        },
+        {
+          proName: "FX_IDC:USDZAR",
+          title: "USD / ZAR"
+        }
+      ],
+      showSymbolLogo: true,
+      isTransparent: true,
+      displayMode: "adaptive",
+      theme:
+        theme === "dark"
+          ? "dark"
+          : "light",
+      locale: "en"
+    };
+  }
+
+  function syncTradingViewTickerTheme(theme) {
+    var resolvedTheme =
+      theme === "dark"
+        ? "dark"
+        : "light";
+
+    if (
+      tradingViewTickerTheme ===
+      resolvedTheme
+    ) {
       return;
     }
 
-    ticker.setAttribute(
-      "theme",
-      theme === "dark"
-        ? "dark"
-        : "light"
+    tradingViewTickerTheme =
+      resolvedTheme;
+
+    renderTradingViewTicker(
+      resolvedTheme
     );
   }
 
+  function renderTradingViewTicker(theme) {
+    var holder =
+      el("portfolioTradingViewTicker");
+
+    if (!holder) {
+      return;
+    }
+
+    holder.innerHTML =
+      '<div class="tradingview-widget-container__widget"></div>' +
+      '<div class="market-pulse-placeholder">Loading live market prices…</div>';
+
+    var script =
+      document.createElement(
+        "script"
+      );
+
+    script.type =
+      "text/javascript";
+
+    script.src =
+      "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js";
+
+    script.async = true;
+
+    script.text =
+      JSON.stringify(
+        tradingViewTickerConfig(
+          theme
+        )
+      );
+
+    script.onload =
+      function () {
+        var placeholder =
+          holder.querySelector(
+            ".market-pulse-placeholder"
+          );
+
+        if (placeholder) {
+          window.setTimeout(
+            function () {
+              if (
+                holder.querySelector(
+                  "iframe"
+                )
+              ) {
+                placeholder.style.display =
+                  "none";
+              }
+            },
+            450
+          );
+        }
+      };
+
+    script.onerror =
+      function () {
+        var placeholder =
+          holder.querySelector(
+            ".market-pulse-placeholder"
+          );
+
+        if (placeholder) {
+          placeholder.textContent =
+            "Market feed temporarily unavailable.";
+        }
+      };
+
+    holder.appendChild(script);
+  }
+
   function attachMarketTicker() {
-    syncTradingViewTickerTheme(
+    var currentTheme =
       document.documentElement.getAttribute(
         "data-theme"
-      ) || getPreferredTheme()
+      ) ||
+      getPreferredTheme();
+
+    renderTradingViewTicker(
+      currentTheme
     );
+
+    tradingViewTickerTheme =
+      currentTheme === "dark"
+        ? "dark"
+        : "light";
   }
 
   var APP_VIEW_STORAGE_KEY =

@@ -3743,3 +3743,83 @@ footer{color:var(--apple-secondary)}
     top:198px;
   }
 }
+
+
+/* =========================================================
+   V21.1 — TICKER EMBED COMPATIBILITY FIX
+   Uses TradingView's iframe embed rather than the custom
+   web component so it loads reliably on GitHub Pages.
+========================================================= */
+
+.market-pulse-tape{
+  min-height:46px!important;
+  height:46px!important;
+}
+
+.market-pulse-widget{
+  position:relative;
+  width:100%;
+  height:46px;
+  min-height:46px;
+  overflow:hidden;
+}
+
+.market-pulse-widget .tradingview-widget-container__widget{
+  width:100%;
+  height:46px;
+}
+
+.market-pulse-widget iframe{
+  display:block!important;
+  width:100%!important;
+  height:46px!important;
+  min-height:46px!important;
+  border:0!important;
+}
+
+.market-pulse-placeholder{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:0;
+  color:var(--apple-secondary);
+  font-size:10px;
+  pointer-events:none;
+}
+
+.market-pulse-widget iframe + .market-pulse-placeholder{
+  display:none;
+}
+
+/* Override v21 web-component sizing rules. */
+.market-pulse-tape tv-ticker-tape{
+  display:none!important;
+}
+
+.app-navigation{
+  top:140px!important;
+}
+
+.portfolio-freeze-shell.is-frozen{
+  top:198px!important;
+}
+
+@media(max-width:700px){
+  .market-pulse-tape,
+  .market-pulse-widget,
+  .market-pulse-widget .tradingview-widget-container__widget,
+  .market-pulse-widget iframe{
+    height:44px!important;
+    min-height:44px!important;
+  }
+
+  .app-navigation{
+    top:138px!important;
+  }
+
+  .portfolio-freeze-shell.is-frozen{
+    top:192px!important;
+  }
+}
