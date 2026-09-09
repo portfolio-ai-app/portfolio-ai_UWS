@@ -5989,6 +5989,47 @@
     updatePremiumIntelligence();
   }
 
+
+  function setTradeBeginnerMode(showAdvanced) {
+    var tradeView = document.querySelector('[data-view="trade"]') || document.querySelector('#tradeView');
+    var button = el("tradeModeToggle");
+    if (!tradeView) return;
+
+    if (showAdvanced) {
+      tradeView.classList.add("trade-show-advanced");
+    } else {
+      tradeView.classList.remove("trade-show-advanced");
+    }
+
+    if (button) {
+      button.setAttribute("aria-pressed", showAdvanced ? "true" : "false");
+      var label = button.querySelector("span");
+      if (label) label.textContent = showAdvanced ? "Simplify trade page" : "Advanced details";
+    }
+
+    try {
+      localStorage.setItem("portfolio-ai-trade-advanced", showAdvanced ? "1" : "0");
+    } catch (e) {}
+  }
+
+  function attachTradeBeginnerMode() {
+    var button = el("tradeModeToggle");
+    var advanced = false;
+
+    try {
+      advanced = localStorage.getItem("portfolio-ai-trade-advanced") === "1";
+    } catch (e) {}
+
+    setTradeBeginnerMode(advanced);
+
+    if (button) {
+      button.addEventListener("click", function() {
+        var tradeView = document.querySelector('[data-view="trade"]') || document.querySelector('#tradeView');
+        setTradeBeginnerMode(!(tradeView && tradeView.classList.contains("trade-show-advanced")));
+      });
+    }
+  }
+
   var APP_VIEW_STORAGE_KEY =
     "portfolio-ai-active-view";
 
@@ -6755,6 +6796,7 @@
     attachAppNavigation();
     attachMarketTicker();
     attachPremiumIntelligence();
+  attachTradeBeginnerMode();
     restoreAppView();
     restorePortfolioFrozen();
     setStatus("Ready", "ready");

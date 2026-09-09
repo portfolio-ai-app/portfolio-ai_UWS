@@ -531,6 +531,29 @@
 </section>
 
 <section class="app-view" id="view-trade" data-view="trade" aria-labelledby="tradeViewTitle">
+    <div class="trade-beginner-bar glass-surface">
+      <div>
+        <span class="section-kicker">TRADE PLANNER</span>
+        <h2>Plan the trade in plain English.</h2>
+        <p>Portfolio AI turns your capital and risk settings into a simple entry, exit and position-size plan.</p>
+      </div>
+      <button type="button" class="trade-mode-toggle" id="tradeModeToggle" aria-pressed="false">
+        <span>Advanced details</span>
+      </button>
+    </div>
+
+    <div class="trade-simple-flow">
+      <article class="trade-simple-step glass-surface">
+        <span>1</span><div><strong>Choose an asset</strong><small>Select what you want to plan a trade for.</small></div>
+      </article>
+      <article class="trade-simple-step glass-surface">
+        <span>2</span><div><strong>Set your risk</strong><small>Start with 1% if you are unsure.</small></div>
+      </article>
+      <article class="trade-simple-step glass-surface">
+        <span>3</span><div><strong>Read your plan</strong><small>Focus on Entry, Stop Loss, Take Profit and Position Size.</small></div>
+      </article>
+    </div>
+
   <header class="view-header">
     <div>
       <span class="section-kicker">TRADE</span>
@@ -550,7 +573,7 @@
 </div>
 <div class="trade-settings-grid">
 <div class="setting-control">
-<label for="riskPerTrade">Risk per trade</label>
+<label for="riskPerTrade">Risk per trade <span class="trade-help" title="The maximum portion of your capital you plan to lose if this trade goes wrong.">i</span></label>
 <div class="percent-input"><input id="riskPerTrade" max="10" min="0.1" step="0.1" type="number" value="1"/><span>%</span></div>
 </div>
 <div class="setting-control">
@@ -558,7 +581,7 @@
 <div class="percent-input"><input id="maxOpenRisk" max="20" min="0.5" step="0.5" type="number" value="3"/><span>%</span></div>
 </div>
 <div class="setting-control">
-<label for="stopDistance">Stop distance</label>
+<label for="stopDistance">Stop distance <span class="trade-help" title="How far price can move against the trade before Portfolio AI considers the setup invalid.">i</span></label>
 <div class="percent-input"><input id="stopDistance" max="25" min="0.1" step="0.1" type="number" value="2"/><span>%</span></div>
 </div>
 <div class="setting-control">
