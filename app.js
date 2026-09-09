@@ -1200,6 +1200,7 @@
 
     if (!selectedAssets.length) {
       tray.innerHTML = '<div class="selection-placeholder">Your selected assets will appear here</div>';
+      updateOverview();
       return;
     }
 
@@ -1215,8 +1216,9 @@
         '</div>';
     }
     tray.innerHTML = html;
-      renderPopularAssets();
-}
+    renderPopularAssets();
+    updateOverview();
+  }
 
   function updatePortfolioSummary() {
     var summary = el("portfolioSummary");
@@ -1900,6 +1902,7 @@
     }
 
     container.innerHTML = html;
+    updateOverview();
   }
 
   /* ========================= STATISTICS ========================= */
@@ -2914,6 +2917,8 @@
           }
 
           setStatus("Analysis complete", "success");
+          updateOverview();
+          setAppView("intelligence");
         } catch (error) {
           console.error(error);
           setStatus("Analysis error", "error");
@@ -5478,6 +5483,391 @@
   }
 
 
+
+  var APP_VIEW_STORAGE_KEY =
+    "portfolio-ai-active-view";
+
+  function setAppView(viewName, options) {
+    options = options || {};
+
+    var allowed = {
+      overview: true,
+      portfolio: true,
+      intelligence: true,
+      trade: true,
+      news: true
+    };
+
+    if (!allowed[viewName]) {
+      viewName = "overview";
+    }
+
+    var views =
+      document.querySelectorAll(
+        ".app-view"
+      );
+
+    Array.prototype.forEach.call(
+      views,
+      function (view) {
+        var active =
+          view.getAttribute(
+            "data-view"
+          ) === viewName;
+
+        view.classList.toggle(
+          "active",
+          active
+        );
+
+        view.setAttribute(
+          "aria-hidden",
+          active ? "false" : "true"
+        );
+      }
+    );
+
+    var navItems =
+      document.querySelectorAll(
+        ".app-nav-item"
+      );
+
+    Array.prototype.forEach.call(
+      navItems,
+      function (button) {
+        var active =
+          button.getAttribute(
+            "data-app-view"
+          ) === viewName;
+
+        button.classList.toggle(
+          "active",
+          active
+        );
+
+        button.setAttribute(
+          "aria-current",
+          active ? "page" : "false"
+        );
+      }
+    );
+
+    try {
+      localStorage.setItem(
+        APP_VIEW_STORAGE_KEY,
+        viewName
+      );
+    } catch (error) {}
+
+    if (
+      options.scroll !== false
+    ) {
+      window.scrollTo({
+        top: 0,
+        behavior:
+          options.instant
+            ? "auto"
+            : "smooth"
+      });
+    }
+
+    if (
+      viewName === "news" &&
+      !newsLoading
+    ) {
+      loadNews(false);
+    }
+  }
+
+  function restoreAppView() {
+    var saved = "overview";
+
+    try {
+      saved =
+        localStorage.getItem(
+          APP_VIEW_STORAGE_KEY
+        ) || "overview";
+    } catch (error) {}
+
+    setAppView(
+      saved,
+      {
+        scroll: false,
+        instant: true
+      }
+    );
+  }
+
+  function attachAppNavigation() {
+    document.addEventListener(
+      "click",
+      function (event) {
+        var target =
+          event.target.closest(
+            "[data-app-view],[data-open-view]"
+          );
+
+        if (!target) {
+          return;
+        }
+
+        var viewName =
+          target.getAttribute(
+            "data-app-view"
+          ) ||
+          target.getAttribute(
+            "data-open-view"
+          );
+
+        if (!viewName) {
+          return;
+        }
+
+        if (
+          target.tagName
+            .toLowerCase() === "a"
+        ) {
+          event.preventDefault();
+        }
+
+        setAppView(viewName);
+      }
+    );
+  }
+
+  function updateOverview() {
+    var count =
+      selectedAssets.length;
+
+    var markets = {};
+
+    selectedAssets.forEach(
+      function (asset) {
+        markets[asset.market] = true;
+      }
+    );
+
+    var marketCount =
+      Object.keys(markets).length;
+
+    var loadedCount =
+      selectedAssets.filter(
+        function (asset) {
+          return !!marketData[asset.key];
+        }
+      ).length;
+
+    var assetCount =
+      el("overviewAssetCount");
+
+    var assetNote =
+      el("overviewAssetNote");
+
+    var marketCountEl =
+      el("overviewMarketCount");
+
+    var dataStatus =
+      el("overviewDataStatus");
+
+    var analysisStatus =
+      el("overviewAnalysisStatus");
+
+    var statusTitle =
+      el("overviewStatusTitle");
+
+    var overviewLead =
+      el("overviewLead");
+
+    if (assetCount) {
+      assetCount.textContent =
+        String(count);
+    }
+
+    if (assetNote) {
+      assetNote.textContent =
+        count
+          ? count +
+            " of " +
+            MAX_SELECTED_ASSETS +
+            " selected"
+          : "None selected";
+    }
+
+    if (marketCountEl) {
+      marketCountEl.textContent =
+        String(marketCount);
+    }
+
+    if (dataStatus) {
+      if (!count) {
+        dataStatus.textContent =
+          "Not loaded";
+      } else if (
+        loadedCount === count
+      ) {
+        dataStatus.textContent =
+          "Ready";
+      } else if (loadedCount) {
+        dataStatus.textContent =
+          loadedCount +
+          "/" +
+          count +
+          " loaded";
+      } else {
+        dataStatus.textContent =
+          "Waiting";
+      }
+    }
+
+    if (analysisStatus) {
+      analysisStatus.textContent =
+        portfolioResults
+          ? "Ready"
+          : loadedCount
+            ? "Ready to run"
+            : "Waiting";
+    }
+
+    if (statusTitle) {
+      if (portfolioResults) {
+        statusTitle.textContent =
+          "Analysis ready";
+      } else if (count) {
+        statusTitle.textContent =
+          loadedCount === count
+            ? "Ready to analyse"
+            : "Portfolio selected";
+      } else {
+        statusTitle.textContent =
+          "Ready to begin";
+      }
+    }
+
+    if (overviewLead) {
+      if (portfolioResults) {
+        overviewLead.textContent =
+          "Your analysis is ready. Review the key numbers below, then open Intelligence for the full forecast or Trade to plan risk.";
+      } else if (count) {
+        overviewLead.textContent =
+          "Your portfolio is taking shape. Load market data in Portfolio, then run the analysis to unlock signals, forecasts and trade planning.";
+      } else {
+        overviewLead.textContent =
+          "Start by choosing the markets you want to follow. Portfolio AI will turn the data into a simple view of direction, risk and possible outcomes.";
+      }
+    }
+
+    var list =
+      el("overviewPortfolioList");
+
+    if (list) {
+      if (!count) {
+        list.innerHTML =
+          '<div class="overview-empty">' +
+          '<strong>No assets selected yet.</strong>' +
+          '<span>Your portfolio will appear here as soon as you add your first asset.</span>' +
+          '</div>';
+      } else {
+        var listHTML = "";
+
+        selectedAssets.forEach(
+          function (asset) {
+            listHTML +=
+              '<div class="overview-portfolio-chip">' +
+              '<span class="overview-portfolio-dot">' +
+              escapeHTML(
+                asset.short ||
+                asset.symbol
+                  .replace("/", "")
+                  .slice(0, 2)
+              ) +
+              '</span>' +
+              '<div>' +
+              '<strong>' +
+              escapeHTML(asset.symbol) +
+              '</strong>' +
+              '<small>' +
+              escapeHTML(asset.market) +
+              '</small>' +
+              '</div>' +
+              '</div>';
+          }
+        );
+
+        list.innerHTML =
+          listHTML;
+      }
+    }
+
+    var expectedValue =
+      el("overviewExpectedValue");
+
+    var expectedNote =
+      el("overviewExpectedNote");
+
+    var profitProbability =
+      el("overviewProfitProbability");
+
+    if (expectedValue) {
+      expectedValue.textContent =
+        portfolioResults
+          ? money(
+              portfolioResults.median
+            )
+          : "—";
+    }
+
+    if (expectedNote) {
+      expectedNote.textContent =
+        portfolioResults
+          ? "Median simulated value after " +
+            String(
+              portfolioResults.horizonName ||
+              "the selected horizon"
+            ).toLowerCase()
+          : "Run an analysis to populate this.";
+    }
+
+    if (profitProbability) {
+      profitProbability.textContent =
+        portfolioResults
+          ? percent(
+              portfolioResults.probabilityProfit
+            )
+          : "—";
+    }
+
+    var direction =
+      el("overviewDirection");
+
+    var directionNote =
+      el("overviewDirectionNote");
+
+    var currentAIState =
+      buildAIState();
+
+    if (direction) {
+      direction.textContent =
+        currentAIState
+          ? currentAIState.verdict
+          : "—";
+    }
+
+    if (directionNote) {
+      if (
+        currentAIState &&
+        currentAIState.strongest
+      ) {
+        directionNote.textContent =
+          currentAIState.strongest.asset.symbol +
+          " · " +
+          currentAIState.strongest.signal.label;
+      } else {
+        directionNote.textContent =
+          "Waiting for market data";
+      }
+    }
+  }
+
   function updateSectionDock() {
     var links =
       Array.prototype.slice.call(
@@ -5857,8 +6247,11 @@
     updatePortfolioSummary();
     attachEvents();
     attachAppleUX();
+    attachAppNavigation();
+    restoreAppView();
     restorePortfolioFrozen();
     setStatus("Ready", "ready");
+    updateOverview();
 
     renderPopularAssets();
     renderAssetGrid();

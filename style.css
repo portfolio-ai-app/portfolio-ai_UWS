@@ -2547,3 +2547,749 @@ footer{color:var(--apple-secondary)}
   html{scroll-behavior:auto}
   *{transition:none!important}
 }
+
+
+/* =========================================================
+   V19 — FOCUSED APP NAVIGATION / PROGRESSIVE DISCLOSURE
+========================================================= */
+
+.v19-shell{
+  min-height:100vh;
+}
+
+.v19-container{
+  padding-top:24px;
+  padding-bottom:70px;
+}
+
+.app-navigation{
+  position:sticky;
+  top:58px;
+  z-index:115;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:4px;
+  width:max-content;
+  max-width:calc(100vw - 24px);
+  margin:0 auto;
+  padding:5px;
+  overflow-x:auto;
+  scrollbar-width:none;
+  border:1px solid var(--apple-hairline);
+  border-radius:999px;
+  background:color-mix(in srgb,var(--apple-card-solid) 82%,transparent);
+  box-shadow:0 10px 34px rgba(0,0,0,.07);
+  backdrop-filter:saturate(180%) blur(24px);
+  -webkit-backdrop-filter:saturate(180%) blur(24px);
+}
+
+.app-navigation::-webkit-scrollbar{
+  display:none;
+}
+
+.app-nav-item{
+  appearance:none;
+  border:0;
+  display:inline-flex;
+  align-items:center;
+  gap:7px;
+  flex:0 0 auto;
+  min-height:38px;
+  padding:0 14px;
+  border-radius:999px;
+  background:transparent;
+  color:var(--apple-secondary);
+  font-family:inherit;
+  font-size:12px;
+  font-weight:650;
+  cursor:pointer;
+  transition:background .18s ease,color .18s ease,transform .18s ease;
+}
+
+.app-nav-item:hover{
+  color:var(--apple-text);
+  background:rgba(127,127,127,.08);
+}
+
+.app-nav-item.active{
+  background:var(--apple-text);
+  color:var(--apple-bg);
+}
+
+.app-nav-icon{
+  font-size:13px;
+  line-height:1;
+}
+
+.app-view{
+  display:none;
+  padding-top:34px;
+  animation:v19FadeIn .24s ease;
+}
+
+.app-view.active{
+  display:block;
+}
+
+@keyframes v19FadeIn{
+  from{opacity:0;transform:translateY(5px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.view-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:28px;
+  padding:34px 4px 26px;
+}
+
+.view-header > div{
+  max-width:760px;
+}
+
+.view-header h1{
+  margin:7px 0 10px;
+  color:var(--apple-text);
+  font-size:clamp(34px,5vw,58px);
+  line-height:1;
+  letter-spacing:-.055em;
+  font-weight:700;
+}
+
+.view-header p{
+  margin:0;
+  max-width:720px;
+  color:var(--apple-secondary);
+  font-size:15px;
+  line-height:1.55;
+  letter-spacing:-.02em;
+}
+
+.view-header-action,
+.text-action-button{
+  appearance:none;
+  border:0;
+  background:transparent;
+  color:var(--apple-blue);
+  font:inherit;
+  font-size:13px;
+  font-weight:650;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
+.view-header-action:hover,
+.text-action-button:hover{
+  text-decoration:underline;
+}
+
+.overview-hero{
+  display:grid;
+  grid-template-columns:minmax(0,1.05fr) minmax(360px,.72fr);
+  gap:42px;
+  align-items:center;
+  min-height:455px;
+  padding:58px 12px 48px;
+}
+
+.overview-hero-copy{
+  max-width:720px;
+}
+
+.overview-hero h1{
+  margin:10px 0 18px;
+  color:var(--apple-text);
+  font-size:clamp(52px,7vw,88px);
+  line-height:.94;
+  letter-spacing:-.068em;
+  font-weight:700;
+}
+
+.overview-hero h1 span{
+  display:block;
+  color:var(--apple-secondary);
+}
+
+.overview-hero p{
+  margin:0;
+  max-width:680px;
+  color:var(--apple-secondary);
+  font-size:clamp(17px,2vw,20px);
+  line-height:1.5;
+  letter-spacing:-.025em;
+}
+
+.overview-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-top:28px;
+}
+
+.apple-primary-button,
+.apple-secondary-button{
+  appearance:none;
+  border:0;
+  min-height:44px;
+  padding:0 19px;
+  border-radius:999px;
+  font-family:inherit;
+  font-size:14px;
+  font-weight:650;
+  cursor:pointer;
+  transition:transform .18s ease,background .18s ease;
+}
+
+.apple-primary-button{
+  background:var(--apple-blue);
+  color:#fff;
+}
+
+.apple-primary-button:hover{
+  background:var(--apple-blue-hover);
+  transform:translateY(-1px);
+}
+
+.apple-secondary-button{
+  background:rgba(0,113,227,.09);
+  color:var(--apple-blue);
+}
+
+.apple-secondary-button:hover{
+  background:rgba(0,113,227,.14);
+}
+
+.overview-status-card{
+  padding:24px;
+  border:1px solid var(--apple-hairline);
+  border-radius:30px;
+  background:var(--apple-card);
+  box-shadow:0 28px 80px rgba(0,0,0,.09);
+  backdrop-filter:blur(30px);
+  -webkit-backdrop-filter:blur(30px);
+}
+
+.overview-status-top{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding-bottom:18px;
+  border-bottom:1px solid var(--apple-hairline);
+}
+
+.overview-status-top > div{
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.overview-status-kicker{
+  color:var(--apple-secondary);
+  font-size:9px;
+  font-weight:750;
+  letter-spacing:.12em;
+}
+
+.overview-status-top strong{
+  color:var(--apple-text);
+  font-size:18px;
+  letter-spacing:-.03em;
+}
+
+.overview-live-dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#30d158;
+  box-shadow:0 0 0 6px rgba(48,209,88,.12);
+}
+
+.overview-status-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin-top:18px;
+}
+
+.overview-stat{
+  min-height:116px;
+  padding:15px;
+  border:1px solid var(--apple-hairline);
+  border-radius:18px;
+  background:color-mix(in srgb,var(--apple-card-solid) 72%,transparent);
+}
+
+.overview-stat span,
+.overview-stat small{
+  display:block;
+  color:var(--apple-secondary);
+}
+
+.overview-stat span{
+  font-size:10px;
+  font-weight:650;
+}
+
+.overview-stat strong{
+  display:block;
+  margin:14px 0 4px;
+  color:var(--apple-text);
+  font-size:22px;
+  letter-spacing:-.045em;
+}
+
+.overview-stat small{
+  font-size:9px;
+  line-height:1.35;
+}
+
+.overview-section{
+  margin-top:24px;
+  padding:30px;
+  border:1px solid var(--apple-hairline);
+  border-radius:var(--apple-radius);
+  background:var(--apple-card);
+  box-shadow:var(--apple-shadow);
+  backdrop-filter:blur(24px);
+  -webkit-backdrop-filter:blur(24px);
+}
+
+.overview-section-heading{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-end;
+  gap:28px;
+  margin-bottom:20px;
+}
+
+.overview-section-heading > div{
+  max-width:690px;
+}
+
+.overview-section-heading h2{
+  margin:6px 0 0;
+  color:var(--apple-text);
+  font-size:30px;
+  line-height:1.05;
+  letter-spacing:-.048em;
+}
+
+.overview-section-heading > p{
+  max-width:390px;
+  margin:0;
+  color:var(--apple-secondary);
+  font-size:12px;
+  line-height:1.5;
+  text-align:right;
+}
+
+.overview-cards{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+}
+
+.overview-feature-card{
+  appearance:none;
+  border:1px solid var(--apple-hairline);
+  display:grid;
+  grid-template-columns:42px minmax(0,1fr) 20px;
+  gap:14px;
+  align-items:start;
+  min-height:160px;
+  padding:20px;
+  border-radius:21px;
+  background:color-mix(in srgb,var(--apple-card-solid) 74%,transparent);
+  color:var(--apple-text);
+  text-align:left;
+  font-family:inherit;
+  cursor:pointer;
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease;
+}
+
+.overview-feature-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 16px 34px rgba(0,0,0,.07);
+  background:var(--apple-card-solid);
+}
+
+.overview-feature-icon{
+  display:grid;
+  place-items:center;
+  width:42px;
+  height:42px;
+  border-radius:13px;
+  background:rgba(0,113,227,.09);
+  color:var(--apple-blue);
+  font-size:20px;
+}
+
+.overview-feature-card small{
+  display:block;
+  margin:2px 0 7px;
+  color:var(--apple-secondary);
+  font-size:9px;
+  font-weight:750;
+  letter-spacing:.11em;
+}
+
+.overview-feature-card strong{
+  display:block;
+  font-size:16px;
+  letter-spacing:-.025em;
+}
+
+.overview-feature-card p{
+  margin:8px 0 0;
+  color:var(--apple-secondary);
+  font-size:11px;
+  line-height:1.55;
+}
+
+.overview-chevron{
+  align-self:center;
+  color:var(--apple-secondary);
+  font-size:24px;
+  font-weight:300;
+}
+
+.compact-heading{
+  align-items:center;
+}
+
+.overview-portfolio-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:9px;
+}
+
+.overview-portfolio-chip{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  min-height:48px;
+  padding:8px 13px;
+  border:1px solid var(--apple-hairline);
+  border-radius:16px;
+  background:color-mix(in srgb,var(--apple-card-solid) 76%,transparent);
+}
+
+.overview-portfolio-chip strong,
+.overview-portfolio-chip small{
+  display:block;
+}
+
+.overview-portfolio-chip strong{
+  color:var(--apple-text);
+  font-size:12px;
+}
+
+.overview-portfolio-chip small{
+  margin-top:2px;
+  color:var(--apple-secondary);
+  font-size:9px;
+}
+
+.overview-portfolio-dot{
+  display:grid;
+  place-items:center;
+  width:30px;
+  height:30px;
+  border-radius:10px;
+  background:rgba(0,113,227,.09);
+  color:var(--apple-blue);
+  font-size:10px;
+  font-weight:800;
+}
+
+.overview-empty{
+  width:100%;
+  padding:28px 18px;
+  border:1px dashed var(--apple-hairline);
+  border-radius:18px;
+  text-align:center;
+}
+
+.overview-empty strong,
+.overview-empty span{
+  display:block;
+}
+
+.overview-empty strong{
+  color:var(--apple-text);
+  font-size:13px;
+}
+
+.overview-empty span{
+  margin-top:5px;
+  color:var(--apple-secondary);
+  font-size:10px;
+}
+
+.overview-analysis-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;
+}
+
+.overview-analysis-card{
+  min-height:142px;
+  padding:18px;
+  border:1px solid var(--apple-hairline);
+  border-radius:20px;
+  background:color-mix(in srgb,var(--apple-card-solid) 74%,transparent);
+}
+
+.overview-analysis-card span,
+.overview-analysis-card small{
+  display:block;
+  color:var(--apple-secondary);
+}
+
+.overview-analysis-card span{
+  font-size:10px;
+  font-weight:650;
+}
+
+.overview-analysis-card strong{
+  display:block;
+  margin:24px 0 5px;
+  color:var(--apple-text);
+  font-size:27px;
+  letter-spacing:-.05em;
+}
+
+.overview-analysis-card small{
+  font-size:9px;
+  line-height:1.4;
+}
+
+.overview-how{
+  margin:24px 0 0;
+  padding:44px 30px;
+  text-align:center;
+}
+
+.overview-how h2{
+  margin:8px 0 26px;
+  color:var(--apple-text);
+  font-size:34px;
+  letter-spacing:-.05em;
+}
+
+.overview-how-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+  max-width:900px;
+  margin:0 auto;
+}
+
+.overview-how-grid > div{
+  padding:22px;
+}
+
+.overview-how-grid > div > span{
+  display:grid;
+  place-items:center;
+  width:32px;
+  height:32px;
+  margin:0 auto 12px;
+  border-radius:50%;
+  background:var(--apple-text);
+  color:var(--apple-bg);
+  font-size:11px;
+  font-weight:750;
+}
+
+.overview-how-grid strong{
+  display:block;
+  color:var(--apple-text);
+  font-size:15px;
+}
+
+.overview-how-grid p{
+  margin:7px auto 0;
+  max-width:220px;
+  color:var(--apple-secondary);
+  font-size:10px;
+  line-height:1.5;
+}
+
+/* Inside focused views, remove the old "everything is a dashboard" rhythm. */
+.app-view:not(#view-overview) > .glass-card,
+.app-view:not(#view-overview) > .action-bar,
+.app-view:not(#view-overview) > .kpi-grid,
+.app-view:not(#view-overview) > .results-grid{
+  margin-bottom:16px;
+}
+
+#view-portfolio .configuration-card{
+  margin-top:0;
+}
+
+#view-portfolio .asset-browser-card{
+  margin-top:16px;
+}
+
+#view-intelligence .ai-advisor-card{
+  margin-top:0;
+}
+
+#view-trade .trade-planner-card,
+#view-news .news-hub-card{
+  margin-top:0;
+}
+
+/* Old v18 dock is no longer part of the layout. */
+.section-dock,
+.welcome-card,
+.apple-hero{
+  display:none!important;
+}
+
+/* Let the selected portfolio remain useful without covering the app nav. */
+.portfolio-freeze-shell.is-frozen{
+  top:116px;
+}
+
+/* Footer belongs to the app rather than a specific view. */
+.v19-container > .app-footer{
+  margin-top:54px;
+}
+
+/* Mobile */
+@media(max-width:900px){
+  .overview-hero{
+    grid-template-columns:1fr;
+    min-height:auto;
+    padding-top:42px;
+  }
+
+  .overview-status-card{
+    max-width:none;
+  }
+
+  .overview-cards{
+    grid-template-columns:1fr;
+  }
+
+  .overview-section-heading{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .overview-section-heading > p{
+    text-align:left;
+  }
+}
+
+@media(max-width:700px){
+  .v19-container{
+    padding-top:12px;
+  }
+
+  .app-navigation{
+    top:60px;
+    justify-content:flex-start;
+    border-radius:18px;
+  }
+
+  .app-nav-item{
+    padding:0 11px;
+  }
+
+  .app-nav-icon{
+    display:none;
+  }
+
+  .app-view{
+    padding-top:20px;
+  }
+
+  .view-header{
+    align-items:flex-start;
+    flex-direction:column;
+    padding:24px 2px 18px;
+  }
+
+  .view-header h1{
+    font-size:38px;
+  }
+
+  .overview-hero{
+    gap:24px;
+    padding:28px 2px 24px;
+  }
+
+  .overview-hero h1{
+    font-size:49px;
+  }
+
+  .overview-hero p{
+    font-size:16px;
+  }
+
+  .overview-status-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .overview-section{
+    padding:22px;
+    border-radius:22px;
+  }
+
+  .overview-section-heading h2{
+    font-size:26px;
+  }
+
+  .overview-analysis-grid,
+  .overview-how-grid{
+    grid-template-columns:1fr;
+  }
+
+  .overview-analysis-card{
+    min-height:118px;
+  }
+
+  .overview-analysis-card strong{
+    margin-top:18px;
+  }
+
+  .overview-how{
+    padding:32px 12px;
+  }
+
+  .portfolio-freeze-shell.is-frozen{
+    top:112px;
+  }
+}
+
+@media(max-width:430px){
+  .app-navigation{
+    width:100%;
+    max-width:100%;
+  }
+
+  .app-nav-item{
+    font-size:11px;
+    padding:0 10px;
+  }
+
+  .overview-status-grid{
+    grid-template-columns:1fr;
+  }
+
+  .overview-actions{
+    align-items:stretch;
+    flex-direction:column;
+  }
+
+  .apple-primary-button,
+  .apple-secondary-button{
+    width:100%;
+  }
+}

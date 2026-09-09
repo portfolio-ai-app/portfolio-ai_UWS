@@ -7,443 +7,548 @@
   <meta name="theme-color" content="#f5f5f7">
   <meta name="color-scheme" content="light dark">
   <title>Portfolio AI — Market Intelligence</title>
-
   <link rel="stylesheet" href="style.css">
-
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
   <script src="app.js" defer></script>
 </head>
 <body>
-<div class="app-shell">
-  <nav class="top-nav">
-    <a class="brand" href="#" aria-label="Portfolio AI home">
-      <div class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></div>
-      <div class="brand-copy"><strong>Portfolio AI</strong><small>Market Intelligence</small></div>
-    </a>
 
-    <div class="nav-actions">
-      <div class="system-pill"><span class="status-dot"></span><span id="systemStatus">Ready</span></div>
-      <button id="themeToggle" class="theme-toggle" type="button" aria-label="Switch theme" aria-pressed="false" title="Switch theme">
-        <span class="theme-icon-wrap">
-          <svg class="sun-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
-          <svg class="moon-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"></path></svg>
-        </span>
-        <span class="theme-toggle-label">Appearance</span>
+<div class="app-shell v19-shell">
+<nav class="top-nav">
+<a aria-label="Portfolio AI home" class="brand" href="#" data-open-view="overview">
+<div aria-hidden="true" class="brand-mark"><span></span><span></span><span></span></div>
+<div class="brand-copy"><strong>Portfolio AI</strong><small>Market Intelligence</small></div>
+</a>
+<div class="nav-actions">
+<div class="system-pill"><span class="status-dot"></span><span id="systemStatus">Ready</span></div>
+<button aria-label="Switch theme" aria-pressed="false" class="theme-toggle" id="themeToggle" title="Switch theme" type="button">
+<span class="theme-icon-wrap">
+<svg aria-hidden="true" class="sun-icon" viewbox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+<svg aria-hidden="true" class="moon-icon" viewbox="0 0 24 24"><path d="M20.5 14.5A8.5 8.5 0 0 1 9.5 3.5a8.5 8.5 0 1 0 11 11z"></path></svg>
+</span>
+<span class="theme-toggle-label">Appearance</span>
+</button>
+</div>
+</nav>
+<nav class="app-navigation" aria-label="Primary">
+  <button type="button" class="app-nav-item active" data-app-view="overview">
+    <span class="app-nav-icon">⌂</span><span>Overview</span>
+  </button>
+  <button type="button" class="app-nav-item" data-app-view="portfolio">
+    <span class="app-nav-icon">◉</span><span>Portfolio</span>
+  </button>
+  <button type="button" class="app-nav-item" data-app-view="intelligence">
+    <span class="app-nav-icon">⌁</span><span>Intelligence</span>
+  </button>
+  <button type="button" class="app-nav-item" data-app-view="trade">
+    <span class="app-nav-icon">↗</span><span>Trade</span>
+  </button>
+  <button type="button" class="app-nav-item" data-app-view="news">
+    <span class="app-nav-icon">◫</span><span>News</span>
+  </button>
+</nav>
+
+<main class="container v19-container">
+
+<section class="app-view active" id="view-overview" data-view="overview" aria-labelledby="overviewTitle">
+  <section class="overview-hero">
+    <div class="overview-hero-copy">
+      <span class="eyebrow">PORTFOLIO AI</span>
+      <h1 id="overviewTitle">Your portfolio.<span>One clear view.</span></h1>
+      <p id="overviewLead">Start by choosing the markets you want to follow. Portfolio AI will turn the data into a simple view of direction, risk and possible outcomes.</p>
+      <div class="overview-actions">
+        <button type="button" class="apple-primary-button" data-open-view="portfolio">Build my portfolio</button>
+        <button type="button" class="apple-secondary-button" data-open-view="intelligence">View intelligence</button>
+      </div>
+    </div>
+
+    <div class="overview-status-card">
+      <div class="overview-status-top">
+        <div>
+          <span class="overview-status-kicker">PORTFOLIO STATUS</span>
+          <strong id="overviewStatusTitle">Ready to begin</strong>
+        </div>
+        <span class="overview-live-dot"></span>
+      </div>
+
+      <div class="overview-status-grid">
+        <div class="overview-stat">
+          <span>Assets</span>
+          <strong id="overviewAssetCount">0</strong>
+          <small id="overviewAssetNote">None selected</small>
+        </div>
+        <div class="overview-stat">
+          <span>Markets</span>
+          <strong id="overviewMarketCount">0</strong>
+          <small>Diversification view</small>
+        </div>
+        <div class="overview-stat">
+          <span>Market data</span>
+          <strong id="overviewDataStatus">Not loaded</strong>
+          <small>Latest available data</small>
+        </div>
+        <div class="overview-stat">
+          <span>Analysis</span>
+          <strong id="overviewAnalysisStatus">Waiting</strong>
+          <small>Forecast + signals</small>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="overview-section">
+    <div class="overview-section-heading">
+      <div>
+        <span class="section-kicker">YOUR WORKSPACE</span>
+        <h2>Everything important, without the noise.</h2>
+      </div>
+      <p>Portfolio AI keeps advanced tools available, but only shows them when you need them.</p>
+    </div>
+
+    <div class="overview-cards">
+      <button class="overview-feature-card" type="button" data-open-view="portfolio">
+        <span class="overview-feature-icon">＋</span>
+        <div>
+          <small>PORTFOLIO</small>
+          <strong>Choose your assets</strong>
+          <p>Build one mixed portfolio across stocks, ETFs, forex, crypto and commodities.</p>
+        </div>
+        <span class="overview-chevron">›</span>
+      </button>
+
+      <button class="overview-feature-card" type="button" data-open-view="intelligence">
+        <span class="overview-feature-icon">⌁</span>
+        <div>
+          <small>INTELLIGENCE</small>
+          <strong>Understand the market</strong>
+          <p>See signals, forecast ranges, correlation and the strongest setup in one place.</p>
+        </div>
+        <span class="overview-chevron">›</span>
+      </button>
+
+      <button class="overview-feature-card" type="button" data-open-view="trade">
+        <span class="overview-feature-icon">↗</span>
+        <div>
+          <small>TRADE</small>
+          <strong>Plan before you act</strong>
+          <p>Translate capital and risk into position size, stop loss and take profit scenarios.</p>
+        </div>
+        <span class="overview-chevron">›</span>
+      </button>
+
+      <button class="overview-feature-card" type="button" data-open-view="news">
+        <span class="overview-feature-icon">◫</span>
+        <div>
+          <small>NEWS</small>
+          <strong>Keep the context close</strong>
+          <p>Follow market headlines around your portfolio without crowding the analysis screen.</p>
+        </div>
+        <span class="overview-chevron">›</span>
       </button>
     </div>
-  </nav>
+  </section>
 
-  <header class="hero apple-hero" id="overview">
-    <div class="hero-copy">
-      <span class="eyebrow">PORTFOLIO AI</span>
-      <h1>Markets, made clearer.<span>One portfolio. One intelligent view.</span></h1>
-      <p>Build a portfolio, understand what the signals mean, size trades around your risk, and explore possible outcomes — without needing to be a market expert.</p>
-      <div class="hero-actions">
-        <a class="primary-hero-button" href="#build">Build my portfolio</a>
-        <a class="secondary-hero-button" href="#learn">See how it works</a>
+  <section class="overview-section overview-portfolio-section">
+    <div class="overview-section-heading compact-heading">
+      <div>
+        <span class="section-kicker">CURRENT PORTFOLIO</span>
+        <h2>What you’re following</h2>
       </div>
-      <div class="hero-trust-row">
-        <span>Live market data</span>
-        <span>Risk-based sizing</span>
-        <span>Scenario forecasting</span>
-      </div>
+      <button type="button" class="text-action-button" data-open-view="portfolio">Edit portfolio</button>
     </div>
 
-    <div class="hero-product-card" aria-hidden="true">
-      <div class="hero-product-top">
-        <span class="hero-product-dot"></span>
-        <span>Portfolio overview</span>
-        <strong>Ready</strong>
-      </div>
-      <div class="hero-product-value">$10,000</div>
-      <div class="hero-product-caption">Starting portfolio</div>
-      <div class="hero-product-bars">
-        <span style="height:35%"></span><span style="height:48%"></span><span style="height:42%"></span>
-        <span style="height:62%"></span><span style="height:58%"></span><span style="height:76%"></span>
-        <span style="height:70%"></span><span style="height:88%"></span>
-      </div>
-      <div class="hero-product-footer">
-        <span>Forecast</span>
-        <strong>Explore possibilities</strong>
+    <div id="overviewPortfolioList" class="overview-portfolio-list">
+      <div class="overview-empty">
+        <strong>No assets selected yet.</strong>
+        <span>Your portfolio will appear here as soon as you add your first asset.</span>
       </div>
     </div>
+  </section>
+
+  <section class="overview-section">
+    <div class="overview-section-heading compact-heading">
+      <div>
+        <span class="section-kicker">LATEST ANALYSIS</span>
+        <h2>Your key numbers</h2>
+      </div>
+      <button type="button" class="text-action-button" data-open-view="intelligence">Open intelligence</button>
+    </div>
+
+    <div class="overview-analysis-grid">
+      <article class="overview-analysis-card">
+        <span>Expected value</span>
+        <strong id="overviewExpectedValue">—</strong>
+        <small id="overviewExpectedNote">Run an analysis to populate this.</small>
+      </article>
+      <article class="overview-analysis-card">
+        <span>Probability of profit</span>
+        <strong id="overviewProfitProbability">—</strong>
+        <small>Simulation outcome</small>
+      </article>
+      <article class="overview-analysis-card">
+        <span>Portfolio direction</span>
+        <strong id="overviewDirection">—</strong>
+        <small id="overviewDirectionNote">Waiting for market data</small>
+      </article>
+    </div>
+  </section>
+
+  <section class="overview-how">
+    <span class="section-kicker">HOW IT WORKS</span>
+    <h2>Three steps. That’s it.</h2>
+    <div class="overview-how-grid">
+      <div><span>1</span><strong>Build</strong><p>Choose up to four assets and set your capital.</p></div>
+      <div><span>2</span><strong>Analyse</strong><p>Load market data and let Portfolio AI calculate the signals.</p></div>
+      <div><span>3</span><strong>Plan</strong><p>Use the forecast and trade planner to understand risk before acting.</p></div>
+    </div>
+  </section>
+</section>
+
+<section class="app-view" id="view-portfolio" data-view="portfolio" aria-labelledby="portfolioViewTitle">
+  <header class="view-header">
+    <div>
+      <span class="section-kicker">PORTFOLIO</span>
+      <h1 id="portfolioViewTitle">Build what you want to follow.</h1>
+      <p>Choose your capital, strategy and assets here. Everything else in Portfolio AI will respond to this portfolio.</p>
+    </div>
+    <button type="button" class="view-header-action" data-open-view="overview">Back to overview</button>
   </header>
-
-  <main class="container">
-    <nav class="section-dock" aria-label="Portfolio AI sections">
-      <a href="#build" class="section-dock-link active"><span>1</span>Build</a>
-      <a href="#markets" class="section-dock-link"><span>2</span>Markets</a>
-      <a href="#intelligence" class="section-dock-link"><span>3</span>AI Guidance</a>
-      <a href="#trade" class="section-dock-link"><span>4</span>Trade Planner</a>
-      <a href="#forecast" class="section-dock-link"><span>5</span>Forecast</a>
-    </nav>
-
-    <section class="welcome-card" id="learn">
-      <div class="welcome-copy">
-        <span class="section-kicker">START HERE</span>
-        <h2>Three steps. That’s it.</h2>
-        <p>Portfolio AI explains the numbers as it goes, so a first-time investor can follow the same workflow as an experienced trader.</p>
-      </div>
-      <div class="welcome-steps">
-        <div class="welcome-step"><span>1</span><div><strong>Choose assets</strong><small>Mix stocks, ETFs, forex, crypto and commodities.</small></div></div>
-        <div class="welcome-step"><span>2</span><div><strong>Load intelligence</strong><small>See prices, trend, momentum and portfolio guidance.</small></div></div>
-        <div class="welcome-step"><span>3</span><div><strong>Plan the risk</strong><small>Understand position size, stop loss, take profit and forecast scenarios.</small></div></div>
-      </div>
-    </section>
-    <section class="glass-card configuration-card apple-section" id="build">
-      <div class="section-header">
-        <div><span class="section-kicker">STEP 1 · SETUP</span><h2>Tell us how you want to invest</h2><p>Start with your capital and choose whether you’re thinking like an investor or a trader. You can change these settings anytime.</p></div>
-        <div class="analysis-badge">Monte Carlo</div>
-      </div>
-
-      <div class="investment-row">
-        <div><label for="investment">Initial investment</label><p>Portfolio starting value</p></div>
-        <div class="money-input"><span>$</span><input id="investment" type="number" value="10000" min="100" step="100"></div>
-      </div>
-
-      <div class="settings-grid">
-        <div class="setting-control"><label for="strategy">Strategy</label><select id="strategy"><option value="Investor">Investor</option><option value="Trader">Trader</option></select></div>
-        <div class="setting-control"><label for="horizon">Forecast horizon</label><select id="horizon"></select></div>
-        <div class="setting-control"><label for="simulations">Simulations</label><select id="simulations"><option value="1000">1,000</option><option value="2500" selected>2,500</option><option value="5000">5,000</option><option value="10000">10,000</option><option value="25000">25,000</option></select></div>
-      </div>
-    </section>
-
-    <section class="glass-card news-hub-card apple-section" id="markets">
-      <div class="section-header news-heading">
-        <div><span class="section-kicker">STEP 2 · MARKET CONTEXT</span><h2>What’s moving the market?</h2><p>Follow the headlines around your portfolio and the broader market without leaving the dashboard.</p></div>
-        <button type="button" id="newsRefresh" class="icon-button" title="Refresh news" aria-label="Refresh news">↻</button>
-      </div>
-
-      <div class="news-tabs" role="tablist" aria-label="Financial news categories">
-        <button type="button" class="news-tab active" data-news-filter="portfolio">For You</button>
-        <button type="button" class="news-tab" data-news-filter="markets">Markets</button>
-        <button type="button" class="news-tab" data-news-filter="stocks">Stocks</button>
-        <button type="button" class="news-tab" data-news-filter="crypto">Crypto</button>
-        <button type="button" class="news-tab" data-news-filter="forex">Forex</button>
-        <button type="button" class="news-tab" data-news-filter="commodities">Commodities</button>
-        <button type="button" class="news-tab" data-news-filter="south-africa">South Africa</button>
-      </div>
-
-      <div class="news-meta"><span id="newsStatus">Loading latest financial headlines…</span><span id="newsPortfolioHint">For You follows your selected assets</span></div>
-      <div id="newsProviderHint" class="news-provider-hint">Headlines are cached and deduplicated for speed. Refresh only when you explicitly want a new news request.</div>
-      <div id="newsGrid" class="news-grid"><div class="catalog-loader"><span></span><p>Loading financial news…</p></div></div>
-    </section>
-
-    <section class="glass-card asset-browser-card apple-section">
-      <div class="section-header asset-header">
-        <div><span class="section-kicker">BUILD YOUR PORTFOLIO</span><h2>Choose what you want to follow</h2><p>Search by company, ticker or market. You can combine different asset classes in the same analysis.</p></div>
-        <div class="selection-count"><strong id="assetCount">0</strong><span>selected</span></div>
-      </div>
-      <div class="plan-limit-row">
-        <div id="planLimitBadge" class="plan-limit-badge">
+  <section class="glass-card configuration-card apple-section">
+<div class="section-header">
+<div><span class="section-kicker">STEP 1 · SETUP</span><h2>Tell us how you want to invest</h2><p>Start with your capital and choose whether you’re thinking like an investor or a trader. You can change these settings anytime.</p></div>
+<div class="analysis-badge">Monte Carlo</div>
+</div>
+<div class="investment-row">
+<div><label for="investment">Initial investment</label><p>Portfolio starting value</p></div>
+<div class="money-input"><span>$</span><input id="investment" min="100" step="100" type="number" value="10000"/></div>
+</div>
+<div class="settings-grid">
+<div class="setting-control"><label for="strategy">Strategy</label><select id="strategy"><option value="Investor">Investor</option><option value="Trader">Trader</option></select></div>
+<div class="setting-control"><label for="horizon">Forecast horizon</label><select id="horizon"></select></div>
+<div class="setting-control"><label for="simulations">Simulations</label><select id="simulations"><option value="1000">1,000</option><option selected="" value="2500">2,500</option><option value="5000">5,000</option><option value="10000">10,000</option><option value="25000">25,000</option></select></div>
+</div>
+</section><section class="glass-card asset-browser-card apple-section">
+<div class="section-header asset-header">
+<div><span class="section-kicker">BUILD YOUR PORTFOLIO</span><h2>Choose what you want to follow</h2><p>Search by company, ticker or market. You can combine different asset classes in the same analysis.</p></div>
+<div class="selection-count"><strong id="assetCount">0</strong><span>selected</span></div>
+</div>
+<div class="plan-limit-row">
+<div class="plan-limit-badge" id="planLimitBadge">
           Starter access · <strong id="planLimitCount">0 / 4</strong> assets selected
         </div>
-        <span class="plan-limit-note">Choose up to 4 assets for one analysis. You can remove or replace them at any time.</span>
-      </div>
+<span class="plan-limit-note">Choose up to 4 assets for one analysis. You can remove or replace them at any time.</span>
+</div>
+<div class="portfolio-freeze-shell" id="portfolioFreezeShell">
+<div class="portfolio-freeze-head">
+<div>
+<span class="portfolio-freeze-kicker">YOUR PORTFOLIO</span>
+<span class="portfolio-freeze-help">Keep your selected assets visible while you scroll.</span>
+</div>
+<button aria-pressed="false" class="freeze-portfolio-button" id="freezePortfolio" type="button">
+<span class="freeze-icon">⌖</span>
+<span class="freeze-label">Freeze portfolio</span>
+</button>
+</div>
+<div class="selected-assets-tray" id="selectedAssetsTray"><div class="selection-placeholder">Your selected assets will appear here</div></div>
+</div>
+<div aria-label="Market categories" class="market-tabs" role="tablist">
+<button class="market-tab active" data-market="Stocks" type="button">Stocks</button>
+<button class="market-tab" data-market="ETFs" type="button">ETFs</button>
+<button class="market-tab" data-market="Forex" type="button">Forex</button>
+<button class="market-tab" data-market="Crypto" type="button">Crypto</button>
+<button class="market-tab" data-market="Commodities" type="button">Commodities</button>
+</div>
+<div class="catalog-toolbar">
+<div class="asset-search">
+<svg aria-hidden="true" viewbox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
+<input autocomplete="off" id="assetSearch" placeholder="Search stocks by name or symbol…" type="search"/>
+<button aria-label="Clear search" class="clear-search" id="clearSearch" type="button">×</button>
+</div>
+<button aria-label="Browse full catalogue" class="catalog-refresh" id="reloadCatalog" title="Browse full catalogue" type="button">Browse all</button>
+</div>
+<div class="catalog-meta"><span id="catalogStatus">Search all supported stocks or use Quick Picks.</span><span id="catalogCount">Fast search</span></div>
+<div class="popular-assets-section" id="popularAssetsSection">
+<div class="popular-assets-head">
+<div>
+<span class="popular-assets-kicker">QUICK PICKS</span>
+<strong>Popular assets</strong>
+</div>
+<span>Instant picks. Full directory only loads when you ask for it.</span>
+</div>
+<div class="popular-assets-grid" id="popularAssets"></div>
+</div>
+<div class="asset-list-header">
+<span>Instruments</span>
+<span></span>
+</div>
+<div class="asset-list" id="assetGrid">
+<div class="large-empty-state small">
+<strong>Search the market instantly</strong>
+<p>Type a company, ticker, currency pair or crypto name. Use Browse all only when you want the full directory.</p>
+</div>
+</div>
+<div class="catalog-footer">
+<div class="asset-search-message" id="assetSearchMessage"></div>
+<button class="show-more-button" hidden="" id="showMoreAssets" type="button">Show more</button>
+</div>
+</section><section class="action-bar">
+<div class="action-copy"><strong>Ready to analyse?</strong><span id="portfolioSummary">Select one or more assets.</span></div>
+<div class="action-buttons">
+<button class="button-secondary" id="loadMarketData" type="button">Refresh prices</button>
+<button class="button-primary" id="generatePortfolio" type="button"><span>Run analysis</span><svg aria-hidden="true" viewbox="0 0 24 24"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></button>
+</div>
+</section><section class="glass-card">
+<div class="section-header compact">
+<div><span class="section-kicker">LIVE MARKETS</span><h2>Portfolio market feed</h2><p>Latest available quotes for your selected instruments.</p></div>
+<button aria-label="Refresh prices" class="icon-button" id="refreshPricesMini" title="Refresh prices" type="button">↻</button>
+</div>
+<div class="market-feed" id="marketData"><div class="large-empty-state"><div class="empty-icon">↗</div><strong>No market data yet</strong><p>Choose assets and refresh their prices.</p></div></div>
+<div class="data-notice" id="dataNotice">Quotes are retrieved from Twelve Data. Exchange latency and coverage depend on your subscription.</div>
+</section>
+</section>
 
-      <div id="portfolioFreezeShell" class="portfolio-freeze-shell">
-        <div class="portfolio-freeze-head">
-          <div>
-            <span class="portfolio-freeze-kicker">YOUR PORTFOLIO</span>
-            <span class="portfolio-freeze-help">Keep your selected assets visible while you scroll.</span>
-          </div>
-          <button id="freezePortfolio" class="freeze-portfolio-button" type="button" aria-pressed="false">
-            <span class="freeze-icon">⌖</span>
-            <span class="freeze-label">Freeze portfolio</span>
-          </button>
-        </div>
-        <div id="selectedAssetsTray" class="selected-assets-tray"><div class="selection-placeholder">Your selected assets will appear here</div></div>
-      </div>
-
-      <div class="market-tabs" role="tablist" aria-label="Market categories">
-        <button type="button" class="market-tab active" data-market="Stocks">Stocks</button>
-        <button type="button" class="market-tab" data-market="ETFs">ETFs</button>
-        <button type="button" class="market-tab" data-market="Forex">Forex</button>
-        <button type="button" class="market-tab" data-market="Crypto">Crypto</button>
-        <button type="button" class="market-tab" data-market="Commodities">Commodities</button>
-      </div>
-
-      <div class="catalog-toolbar">
-        <div class="asset-search">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg>
-          <input type="search" id="assetSearch" placeholder="Search stocks by name or symbol…" autocomplete="off">
-          <button id="clearSearch" class="clear-search" type="button" aria-label="Clear search">×</button>
-        </div>
-        <button id="reloadCatalog" class="catalog-refresh" type="button" title="Browse full catalogue" aria-label="Browse full catalogue">Browse all</button>
-      </div>
-
-      <div class="catalog-meta"><span id="catalogStatus">Search all supported stocks or use Quick Picks.</span><span id="catalogCount">Fast search</span></div>
-
-      <div id="popularAssetsSection" class="popular-assets-section">
-        <div class="popular-assets-head">
-          <div>
-            <span class="popular-assets-kicker">QUICK PICKS</span>
-            <strong>Popular assets</strong>
-          </div>
-          <span>Instant picks. Full directory only loads when you ask for it.</span>
-        </div>
-        <div id="popularAssets" class="popular-assets-grid"></div>
-      </div>
-
-      <div class="asset-list-header">
-        <span>Instruments</span>
-        <span></span>
-      </div>
-
-      <div id="assetGrid" class="asset-list">
-        <div class="large-empty-state small">
-          <strong>Search the market instantly</strong>
-          <p>Type a company, ticker, currency pair or crypto name. Use Browse all only when you want the full directory.</p>
-        </div>
-      </div>
-
-      <div class="catalog-footer">
-        <div id="assetSearchMessage" class="asset-search-message"></div>
-        <button id="showMoreAssets" class="show-more-button" type="button" hidden>Show more</button>
-      </div>
-    </section>
-
-    <section class="action-bar">
-      <div class="action-copy"><strong>Ready to analyse?</strong><span id="portfolioSummary">Select one or more assets.</span></div>
-      <div class="action-buttons">
-        <button id="loadMarketData" type="button" class="button-secondary">Refresh prices</button>
-        <button id="generatePortfolio" type="button" class="button-primary"><span>Run analysis</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></button>
-      </div>
-    </section>
-
-    <section class="glass-card">
-      <div class="section-header compact">
-        <div><span class="section-kicker">LIVE MARKETS</span><h2>Portfolio market feed</h2><p>Latest available quotes for your selected instruments.</p></div>
-        <button type="button" id="refreshPricesMini" class="icon-button" title="Refresh prices" aria-label="Refresh prices">↻</button>
-      </div>
-      <div id="marketData" class="market-feed"><div class="large-empty-state"><div class="empty-icon">↗</div><strong>No market data yet</strong><p>Choose assets and refresh their prices.</p></div></div>
-      <div id="dataNotice" class="data-notice">Quotes are retrieved from Twelve Data. Exchange latency and coverage depend on your subscription.</div>
-    </section>
-
-
-    <section class="glass-card ai-advisor-card apple-section" id="intelligence">
-      <div class="section-header compact ai-advisor-header">
-        <div>
-          <span class="section-kicker">PORTFOLIO AI</span>
-          <h2>AI market guidance</h2>
-          <p>Combines trend, momentum, volatility, correlation and forecast data into one readable view.</p>
-        </div>
-        <div id="aiAdvisorStatus" class="ai-advisor-status">Waiting for data</div>
-      </div>
-
-      <div id="aiAdvisor" class="ai-advisor">
-        <div class="ai-empty-state">
-          <div class="ai-orb">AI</div>
-          <div>
-            <strong>Choose assets and load market data.</strong>
-            <p>Portfolio AI will explain whether your selections are aligned, conflicting, concentrated or better treated selectively.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="ai-chat">
-        <div class="ai-chat-head">
-          <div>
-            <span>ASK PORTFOLIO AI</span>
-            <strong>Question the analysis</strong>
-          </div>
-          <small>Answers are generated from the market data currently loaded in this dashboard.</small>
-        </div>
-
-        <div class="ai-prompt-chips">
-          <button type="button" class="ai-prompt-chip" data-ai-question="Which asset has the strongest setup?">Strongest setup</button>
-          <button type="button" class="ai-prompt-chip" data-ai-question="Should I trade all selected assets?">Trade all?</button>
-          <button type="button" class="ai-prompt-chip" data-ai-question="What is the main risk?">Main risk</button>
-          <button type="button" class="ai-prompt-chip" data-ai-question="Which direction is the portfolio leaning?">Direction</button>
-        </div>
-
-        <form id="aiQuestionForm" class="ai-question-form">
-          <input id="aiQuestion" type="text" autocomplete="off" placeholder="Ask: Why should I wait? Which asset looks strongest?" />
-          <button id="aiAskButton" type="submit">Ask AI</button>
-        </form>
-
-        <div id="aiAnswer" class="ai-answer" aria-live="polite">
-          <span class="ai-answer-label">AI</span>
-          <p>Load market data first, then ask me about your selected assets.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="glass-card trade-planner-card apple-section" id="trade">
-      <div class="section-header compact">
-        <div>
-          <span class="section-kicker">RISK & EXECUTION</span>
-          <h2>Trade planner</h2>
-          <p>Turns your capital and risk limits into beginner-friendly position sizes, lot estimates, stops, targets and risk scenarios.</p>
-        </div>
-        <div class="trade-planner-badge">Risk based</div>
-      </div>
-
-      <div class="trade-settings-grid">
-        <div class="setting-control">
-          <label for="riskPerTrade">Risk per trade</label>
-          <div class="percent-input"><input id="riskPerTrade" type="number" value="1" min="0.1" max="10" step="0.1"><span>%</span></div>
-        </div>
-
-        <div class="setting-control">
-          <label for="maxOpenRisk">Max total open risk</label>
-          <div class="percent-input"><input id="maxOpenRisk" type="number" value="3" min="0.5" max="20" step="0.5"><span>%</span></div>
-        </div>
-
-        <div class="setting-control">
-          <label for="stopDistance">Stop distance</label>
-          <div class="percent-input"><input id="stopDistance" type="number" value="2" min="0.1" max="25" step="0.1"><span>%</span></div>
-        </div>
-
-        <div class="setting-control">
-          <label for="rewardRisk">Reward : risk</label>
-          <select id="rewardRisk">
-            <option value="1">1 : 1</option>
-            <option value="1.5">1.5 : 1</option>
-            <option value="2" selected>2 : 1</option>
-            <option value="2.5">2.5 : 1</option>
-            <option value="3">3 : 1</option>
-          </select>
-        </div>
-
-        <div class="setting-control">
-          <label for="plannerLeverage">Leverage preview</label>
-          <select id="plannerLeverage">
-            <option value="1" selected>1×</option>
-            <option value="2">2×</option>
-            <option value="5">5×</option>
-            <option value="10">10×</option>
-            <option value="20">20×</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="trade-beginner-guide">
-        <div class="trade-beginner-head">
-          <div>
-            <span class="section-kicker">FIRST TRADE?</span>
-            <h3>How to read the trade plan</h3>
-            <p>The planner converts your risk settings into a simple trading map. Nothing here guarantees a profitable trade.</p>
-          </div>
-          <button id="toggleTradeGuide" class="trade-guide-toggle" type="button" aria-expanded="true">Hide guide</button>
-        </div>
-
-        <div id="tradeGuideBody" class="trade-guide-body">
-          <div class="trade-guide-item">
-            <strong>1. Direction</strong>
-            <span><b>LONG</b> means the model is leaning upward. <b>SHORT</b> means it is leaning downward. <b>WAIT</b> means the signal is not strong enough.</span>
-          </div>
-          <div class="trade-guide-item">
-            <strong>2. Entry</strong>
-            <span>The current/reference price used to build the scenario. Your broker's actual execution price may differ.</span>
-          </div>
-          <div class="trade-guide-item">
-            <strong>3. Stop loss</strong>
-            <span>Your planned exit if the market moves against the trade. It defines how much price movement you are willing to risk.</span>
-          </div>
-          <div class="trade-guide-item">
-            <strong>4. Take profit</strong>
-            <span>Your planned profit target. The selected reward:risk ratio determines how far the target is from the entry relative to the stop.</span>
-          </div>
-          <div class="trade-guide-item">
-            <strong>5. Position size</strong>
-            <span>The quantity calculated so that reaching the stop is approximately equal to your chosen money-at-risk budget.</span>
-          </div>
-          <div class="trade-guide-item">
-            <strong>6. Open risk</strong>
-            <span>The maximum planned loss across all active setups if every stop were reached, before slippage, gaps, fees or broker-specific effects.</span>
-          </div>
-        </div>
-      </div>
-
-      <div id="tradePlannerSummary" class="trade-planner-summary">
-        <div class="large-empty-state small">
-          <strong>Load market data to build a trade plan</strong>
-          <p>Position sizes, stop levels, targets, margin estimates and open-risk totals will appear here.</p>
-        </div>
-      </div>
-
-      <div id="tradePlannerGrid" class="trade-planner-grid"></div>
-
-      <div class="trade-planner-note">
-        Position sizing is a risk-control calculation, not a recommendation to trade. “Standard lot equivalent” is an approximation for forex using 100,000 base units; broker contract sizes, margin rules and quote-currency conversion can differ.
-      </div>
-    </section>
-
-
-    <section class="kpi-grid forecast-kpis" id="forecast">
-      <article class="kpi-card">
-        <div class="kpi-icon">$</div>
-        <div class="kpi-label">Expected value</div>
-        <strong id="expectedValue">—</strong>
-        <small id="expectedValueNote">Median simulated portfolio value</small>
-      </article>
-
-      <article class="kpi-card kpi-emphasis">
-        <div class="kpi-icon">±</div>
-        <div class="kpi-label">Projected profit / loss</div>
-        <strong id="projectedProfit">—</strong>
-        <small id="projectedProfitNote">Median change from your investment</small>
-      </article>
-
-      <article class="kpi-card">
-        <div class="kpi-icon">%</div>
-        <div class="kpi-label">Probability of profit</div>
-        <strong id="profitProbability">—</strong>
-        <small>Simulations finishing above your starting value</small>
-      </article>
-
-      <article class="kpi-card">
-        <div class="kpi-icon">↗</div>
-        <div class="kpi-label">Forecast return</div>
-        <strong id="expectedReturn">—</strong>
-        <small id="expectedReturnNote">Median return over the selected horizon</small>
-      </article>
-
-      <article class="kpi-card">
-        <div class="kpi-icon">↘</div>
-        <div class="kpi-label">Stress drawdown</div>
-        <strong id="maxDrawdown">—</strong>
-        <small>Downside drawdown estimate across simulations</small>
-      </article>
-    </section>
-
-    <section class="glass-card chart-card">
-      <div class="section-header compact">
-        <div>
-          <span class="section-kicker">FORECAST</span>
-          <h2>What your investment could become</h2>
-          <p id="chartSubtitle">Run an analysis to generate a probability range.</p>
-        </div>
-      </div>
-
-      <div id="forecastMoneySummary" class="forecast-money-summary">
-        <div class="forecast-money-empty">
+<section class="app-view" id="view-intelligence" data-view="intelligence" aria-labelledby="intelligenceViewTitle">
+  <header class="view-header">
+    <div>
+      <span class="section-kicker">INTELLIGENCE</span>
+      <h1 id="intelligenceViewTitle">See the signal, then the detail.</h1>
+      <p>Start with Portfolio AI’s readable guidance, then explore the probability range, scenarios and asset-level detail when you want it.</p>
+    </div>
+    <button type="button" class="view-header-action" data-open-view="portfolio">Edit portfolio</button>
+  </header>
+  <section class="glass-card ai-advisor-card apple-section">
+<div class="section-header compact ai-advisor-header">
+<div>
+<span class="section-kicker">PORTFOLIO AI</span>
+<h2>AI market guidance</h2>
+<p>Combines trend, momentum, volatility, correlation and forecast data into one readable view.</p>
+</div>
+<div class="ai-advisor-status" id="aiAdvisorStatus">Waiting for data</div>
+</div>
+<div class="ai-advisor" id="aiAdvisor">
+<div class="ai-empty-state">
+<div class="ai-orb">AI</div>
+<div>
+<strong>Choose assets and load market data.</strong>
+<p>Portfolio AI will explain whether your selections are aligned, conflicting, concentrated or better treated selectively.</p>
+</div>
+</div>
+</div>
+<div class="ai-chat">
+<div class="ai-chat-head">
+<div>
+<span>ASK PORTFOLIO AI</span>
+<strong>Question the analysis</strong>
+</div>
+<small>Answers are generated from the market data currently loaded in this dashboard.</small>
+</div>
+<div class="ai-prompt-chips">
+<button class="ai-prompt-chip" data-ai-question="Which asset has the strongest setup?" type="button">Strongest setup</button>
+<button class="ai-prompt-chip" data-ai-question="Should I trade all selected assets?" type="button">Trade all?</button>
+<button class="ai-prompt-chip" data-ai-question="What is the main risk?" type="button">Main risk</button>
+<button class="ai-prompt-chip" data-ai-question="Which direction is the portfolio leaning?" type="button">Direction</button>
+</div>
+<form class="ai-question-form" id="aiQuestionForm">
+<input autocomplete="off" id="aiQuestion" placeholder="Ask: Why should I wait? Which asset looks strongest?" type="text">
+<button id="aiAskButton" type="submit">Ask AI</button>
+</input></form>
+<div aria-live="polite" class="ai-answer" id="aiAnswer">
+<span class="ai-answer-label">AI</span>
+<p>Load market data first, then ask me about your selected assets.</p>
+</div>
+</div>
+</section><section class="kpi-grid forecast-kpis">
+<article class="kpi-card">
+<div class="kpi-icon">$</div>
+<div class="kpi-label">Expected value</div>
+<strong id="expectedValue">—</strong>
+<small id="expectedValueNote">Median simulated portfolio value</small>
+</article>
+<article class="kpi-card kpi-emphasis">
+<div class="kpi-icon">±</div>
+<div class="kpi-label">Projected profit / loss</div>
+<strong id="projectedProfit">—</strong>
+<small id="projectedProfitNote">Median change from your investment</small>
+</article>
+<article class="kpi-card">
+<div class="kpi-icon">%</div>
+<div class="kpi-label">Probability of profit</div>
+<strong id="profitProbability">—</strong>
+<small>Simulations finishing above your starting value</small>
+</article>
+<article class="kpi-card">
+<div class="kpi-icon">↗</div>
+<div class="kpi-label">Forecast return</div>
+<strong id="expectedReturn">—</strong>
+<small id="expectedReturnNote">Median return over the selected horizon</small>
+</article>
+<article class="kpi-card">
+<div class="kpi-icon">↘</div>
+<div class="kpi-label">Stress drawdown</div>
+<strong id="maxDrawdown">—</strong>
+<small>Downside drawdown estimate across simulations</small>
+</article>
+</section><section class="glass-card chart-card">
+<div class="section-header compact">
+<div>
+<span class="section-kicker">FORECAST</span>
+<h2>What your investment could become</h2>
+<p id="chartSubtitle">Run an analysis to generate a probability range.</p>
+</div>
+</div>
+<div class="forecast-money-summary" id="forecastMoneySummary">
+<div class="forecast-money-empty">
           Run an analysis to see what your chosen investment could be worth.
         </div>
-      </div>
-
-      <div class="chart-wrap"><canvas id="forecastChart"></canvas></div>
-    </section>
-
-    <section class="results-grid">
-      <section class="glass-card">
-        <div class="section-header compact"><div><span class="section-kicker">SCENARIOS</span><h2>Possible outcomes</h2></div></div>
-        <div id="scenarioResults" class="scenario-grid"><div class="large-empty-state small"><strong>No forecast yet</strong><p>Your stress, base and upside cases will appear here.</p></div></div>
-      </section>
-      <section class="glass-card">
-        <div class="section-header compact"><div><span class="section-kicker">SIGNALS</span><h2>Asset direction</h2></div></div>
-        <div id="signals" class="signals-grid"><div class="large-empty-state small"><strong>No signals yet</strong><p>Load market data to calculate signals.</p></div></div>
-      </section>
-    </section>
-
-    <section class="glass-card">
-      <div class="section-header compact"><div><span class="section-kicker">ASSET ANALYSIS</span><h2>Portfolio components</h2><p>Historical return, volatility, price and win-rate estimates.</p></div></div>
-      <div id="assetResults" class="asset-results"><div class="large-empty-state small"><strong>No asset analysis yet</strong><p>Selected instruments will appear here after market data loads.</p></div></div>
-    </section>
-
-    <footer class="app-footer"><strong>Portfolio AI</strong><p>For research and demonstration purposes only. Simulations are not financial advice and do not guarantee future performance.</p></footer>
-  </main>
 </div>
+<div class="chart-wrap"><canvas id="forecastChart"></canvas></div>
+</section><section class="results-grid">
+<section class="glass-card">
+<div class="section-header compact"><div><span class="section-kicker">SCENARIOS</span><h2>Possible outcomes</h2></div></div>
+<div class="scenario-grid" id="scenarioResults"><div class="large-empty-state small"><strong>No forecast yet</strong><p>Your stress, base and upside cases will appear here.</p></div></div>
+</section>
+<section class="glass-card">
+<div class="section-header compact"><div><span class="section-kicker">SIGNALS</span><h2>Asset direction</h2></div></div>
+<div class="signals-grid" id="signals"><div class="large-empty-state small"><strong>No signals yet</strong><p>Load market data to calculate signals.</p></div></div>
+</section>
+</section><section class="glass-card">
+<div class="section-header compact"><div><span class="section-kicker">ASSET ANALYSIS</span><h2>Portfolio components</h2><p>Historical return, volatility, price and win-rate estimates.</p></div></div>
+<div class="asset-results" id="assetResults"><div class="large-empty-state small"><strong>No asset analysis yet</strong><p>Selected instruments will appear here after market data loads.</p></div></div>
+</section>
+</section>
+
+<section class="app-view" id="view-trade" data-view="trade" aria-labelledby="tradeViewTitle">
+  <header class="view-header">
+    <div>
+      <span class="section-kicker">TRADE</span>
+      <h1 id="tradeViewTitle">Plan the risk before the trade.</h1>
+      <p>Position sizing, stop loss and take profit live together here so the execution view stays focused.</p>
+    </div>
+    <button type="button" class="view-header-action" data-open-view="intelligence">View signals</button>
+  </header>
+  <section class="glass-card trade-planner-card apple-section">
+<div class="section-header compact">
+<div>
+<span class="section-kicker">RISK &amp; EXECUTION</span>
+<h2>Trade planner</h2>
+<p>Turns your capital and risk limits into beginner-friendly position sizes, lot estimates, stops, targets and risk scenarios.</p>
+</div>
+<div class="trade-planner-badge">Risk based</div>
+</div>
+<div class="trade-settings-grid">
+<div class="setting-control">
+<label for="riskPerTrade">Risk per trade</label>
+<div class="percent-input"><input id="riskPerTrade" max="10" min="0.1" step="0.1" type="number" value="1"/><span>%</span></div>
+</div>
+<div class="setting-control">
+<label for="maxOpenRisk">Max total open risk</label>
+<div class="percent-input"><input id="maxOpenRisk" max="20" min="0.5" step="0.5" type="number" value="3"/><span>%</span></div>
+</div>
+<div class="setting-control">
+<label for="stopDistance">Stop distance</label>
+<div class="percent-input"><input id="stopDistance" max="25" min="0.1" step="0.1" type="number" value="2"/><span>%</span></div>
+</div>
+<div class="setting-control">
+<label for="rewardRisk">Reward : risk</label>
+<select id="rewardRisk">
+<option value="1">1 : 1</option>
+<option value="1.5">1.5 : 1</option>
+<option selected="" value="2">2 : 1</option>
+<option value="2.5">2.5 : 1</option>
+<option value="3">3 : 1</option>
+</select>
+</div>
+<div class="setting-control">
+<label for="plannerLeverage">Leverage preview</label>
+<select id="plannerLeverage">
+<option selected="" value="1">1×</option>
+<option value="2">2×</option>
+<option value="5">5×</option>
+<option value="10">10×</option>
+<option value="20">20×</option>
+</select>
+</div>
+</div>
+<div class="trade-beginner-guide">
+<div class="trade-beginner-head">
+<div>
+<span class="section-kicker">FIRST TRADE?</span>
+<h3>How to read the trade plan</h3>
+<p>The planner converts your risk settings into a simple trading map. Nothing here guarantees a profitable trade.</p>
+</div>
+<button aria-expanded="true" class="trade-guide-toggle" id="toggleTradeGuide" type="button">Hide guide</button>
+</div>
+<div class="trade-guide-body" id="tradeGuideBody">
+<div class="trade-guide-item">
+<strong>1. Direction</strong>
+<span><b>LONG</b> means the model is leaning upward. <b>SHORT</b> means it is leaning downward. <b>WAIT</b> means the signal is not strong enough.</span>
+</div>
+<div class="trade-guide-item">
+<strong>2. Entry</strong>
+<span>The current/reference price used to build the scenario. Your broker's actual execution price may differ.</span>
+</div>
+<div class="trade-guide-item">
+<strong>3. Stop loss</strong>
+<span>Your planned exit if the market moves against the trade. It defines how much price movement you are willing to risk.</span>
+</div>
+<div class="trade-guide-item">
+<strong>4. Take profit</strong>
+<span>Your planned profit target. The selected reward:risk ratio determines how far the target is from the entry relative to the stop.</span>
+</div>
+<div class="trade-guide-item">
+<strong>5. Position size</strong>
+<span>The quantity calculated so that reaching the stop is approximately equal to your chosen money-at-risk budget.</span>
+</div>
+<div class="trade-guide-item">
+<strong>6. Open risk</strong>
+<span>The maximum planned loss across all active setups if every stop were reached, before slippage, gaps, fees or broker-specific effects.</span>
+</div>
+</div>
+</div>
+<div class="trade-planner-summary" id="tradePlannerSummary">
+<div class="large-empty-state small">
+<strong>Load market data to build a trade plan</strong>
+<p>Position sizes, stop levels, targets, margin estimates and open-risk totals will appear here.</p>
+</div>
+</div>
+<div class="trade-planner-grid" id="tradePlannerGrid"></div>
+<div class="trade-planner-note">
+        Position sizing is a risk-control calculation, not a recommendation to trade. “Standard lot equivalent” is an approximation for forex using 100,000 base units; broker contract sizes, margin rules and quote-currency conversion can differ.
+      </div>
+</section>
+</section>
+
+<section class="app-view" id="view-news" data-view="news" aria-labelledby="newsViewTitle">
+  <header class="view-header">
+    <div>
+      <span class="section-kicker">NEWS</span>
+      <h1 id="newsViewTitle">Market context, on its own screen.</h1>
+      <p>Follow headlines for your portfolio and broader markets without interrupting your analysis workflow.</p>
+    </div>
+    <button type="button" class="view-header-action" data-open-view="overview">Back to overview</button>
+  </header>
+  <section class="glass-card news-hub-card apple-section">
+<div class="section-header news-heading">
+<div><span class="section-kicker">STEP 2 · MARKET CONTEXT</span><h2>What’s moving the market?</h2><p>Follow the headlines around your portfolio and the broader market without leaving the dashboard.</p></div>
+<button aria-label="Refresh news" class="icon-button" id="newsRefresh" title="Refresh news" type="button">↻</button>
+</div>
+<div aria-label="Financial news categories" class="news-tabs" role="tablist">
+<button class="news-tab active" data-news-filter="portfolio" type="button">For You</button>
+<button class="news-tab" data-news-filter="markets" type="button">Markets</button>
+<button class="news-tab" data-news-filter="stocks" type="button">Stocks</button>
+<button class="news-tab" data-news-filter="crypto" type="button">Crypto</button>
+<button class="news-tab" data-news-filter="forex" type="button">Forex</button>
+<button class="news-tab" data-news-filter="commodities" type="button">Commodities</button>
+<button class="news-tab" data-news-filter="south-africa" type="button">South Africa</button>
+</div>
+<div class="news-meta"><span id="newsStatus">Loading latest financial headlines…</span><span id="newsPortfolioHint">For You follows your selected assets</span></div>
+<div class="news-provider-hint" id="newsProviderHint">Headlines are cached and deduplicated for speed. Refresh only when you explicitly want a new news request.</div>
+<div class="news-grid" id="newsGrid"><div class="catalog-loader"><span></span><p>Loading financial news…</p></div></div>
+</section>
+</section>
+<footer class="app-footer"><strong>Portfolio AI</strong><p>For research and demonstration purposes only. Simulations are not financial advice and do not guarantee future performance.</p></footer>
+</main>
+</div>
+
 </body>
 </html>
