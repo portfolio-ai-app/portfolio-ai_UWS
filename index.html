@@ -69,7 +69,11 @@
 </section>
 
 <nav class="app-navigation" aria-label="Primary">
-  <button type="button" class="app-nav-item active" data-app-view="overview">
+  <button type="button" class="app-nav-item active" data-app-view="news">
+    <span class="ios-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.1" y="4.35" width="15.8" height="15.3" rx="3"/><path d="M7.35 8h4.15v4.15H7.35Z"/><path d="M14.2 8.2h2.45M14.2 11h2.45M7.35 15h9.3M7.35 17.5h6.1"/></svg></span>
+    <span class="ios-nav-label">News</span>
+  </button>
+  <button type="button" class="app-nav-item" data-app-view="overview">
     <span class="ios-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.2 10.2 12 4.7l6.8 5.5v7.4a1.55 1.55 0 0 1-1.55 1.55H6.75A1.55 1.55 0 0 1 5.2 17.6Z"/><path d="M9.5 19.15v-5.1h5v5.1"/></svg></span>
     <span class="ios-nav-label">Overview</span>
   </button>
@@ -85,15 +89,40 @@
     <span class="ios-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 17 4.7-4.7 3.15 3.15L19 9.3"/><path d="M14.75 9.3H19v4.25"/></svg></span>
     <span class="ios-nav-label">Trade</span>
   </button>
-  <button type="button" class="app-nav-item" data-app-view="news">
-    <span class="ios-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4.1" y="4.35" width="15.8" height="15.3" rx="3"/><path d="M7.35 8h4.15v4.15H7.35Z"/><path d="M14.2 8.2h2.45M14.2 11h2.45M7.35 15h9.3M7.35 17.5h6.1"/></svg></span>
-    <span class="ios-nav-label">News</span>
-  </button>
 </nav>
 
 <main class="container v19-container">
 
-<section class="app-view active" id="view-overview" data-view="overview" aria-labelledby="overviewTitle">
+<section class="app-view active" id="view-news" data-view="news" aria-labelledby="newsViewTitle">
+  <header class="view-header">
+    <div>
+      <span class="section-kicker">LIVE MARKET NEWS</span>
+      <h1 id="newsViewTitle">What’s moving the market right now?</h1>
+      <p>Start with the headlines, then move into your portfolio, intelligence and trade views with the market context already in mind.</p>
+    </div>
+    <button type="button" class="view-header-action" data-open-view="portfolio">Build my portfolio</button>
+  </header>
+  <section class="glass-card news-hub-card apple-section">
+<div class="section-header news-heading">
+<div><span class="section-kicker">HEADLINE · MARKET CONTEXT</span><h2>What’s moving the market?</h2><p>English market headlines are prioritised, cached and deduplicated so the dashboard stays useful without wasting NewsData credits.</p></div>
+<button aria-label="Refresh news" class="icon-button" id="newsRefresh" title="Refresh news" type="button">↻</button>
+</div>
+<div aria-label="Financial news categories" class="news-tabs" role="tablist">
+<button class="news-tab active" data-news-filter="portfolio" type="button">For You</button>
+<button class="news-tab" data-news-filter="markets" type="button">Markets</button>
+<button class="news-tab" data-news-filter="stocks" type="button">Stocks</button>
+<button class="news-tab" data-news-filter="crypto" type="button">Crypto</button>
+<button class="news-tab" data-news-filter="forex" type="button">Forex</button>
+<button class="news-tab" data-news-filter="commodities" type="button">Commodities</button>
+<button class="news-tab" data-news-filter="south-africa" type="button">South Africa</button>
+</div>
+<div class="news-meta"><span id="newsStatus">Loading latest financial headlines…</span><span id="newsPortfolioHint">For You follows your selected assets</span></div>
+<div class="news-provider-hint" id="newsProviderHint">Headlines are cached and deduplicated for speed. Refresh only when you explicitly want a new news request.</div>
+<div class="news-grid" id="newsGrid"><div class="catalog-loader"><span></span><p>Loading financial news…</p></div></div>
+</section>
+</section>
+
+<section class="app-view" id="view-overview" data-view="overview" aria-labelledby="overviewTitle">
   <section class="overview-hero">
     <div class="overview-hero-copy">
       <span class="eyebrow">PORTFOLIO AI</span>
@@ -713,35 +742,6 @@
 <div class="trade-planner-note">
         Position sizing is a risk-control calculation, not a recommendation to trade. “Standard lot equivalent” is an approximation for forex using 100,000 base units; broker contract sizes, margin rules and quote-currency conversion can differ.
       </div>
-</section>
-</section>
-
-<section class="app-view" id="view-news" data-view="news" aria-labelledby="newsViewTitle">
-  <header class="view-header">
-    <div>
-      <span class="section-kicker">NEWS</span>
-      <h1 id="newsViewTitle">Market context, on its own screen.</h1>
-      <p>Follow headlines for your portfolio and broader markets without interrupting your analysis workflow.</p>
-    </div>
-    <button type="button" class="view-header-action" data-open-view="overview">Back to overview</button>
-  </header>
-  <section class="glass-card news-hub-card apple-section">
-<div class="section-header news-heading">
-<div><span class="section-kicker">STEP 2 · MARKET CONTEXT</span><h2>What’s moving the market?</h2><p>Follow the headlines around your portfolio and the broader market without leaving the dashboard.</p></div>
-<button aria-label="Refresh news" class="icon-button" id="newsRefresh" title="Refresh news" type="button">↻</button>
-</div>
-<div aria-label="Financial news categories" class="news-tabs" role="tablist">
-<button class="news-tab active" data-news-filter="portfolio" type="button">For You</button>
-<button class="news-tab" data-news-filter="markets" type="button">Markets</button>
-<button class="news-tab" data-news-filter="stocks" type="button">Stocks</button>
-<button class="news-tab" data-news-filter="crypto" type="button">Crypto</button>
-<button class="news-tab" data-news-filter="forex" type="button">Forex</button>
-<button class="news-tab" data-news-filter="commodities" type="button">Commodities</button>
-<button class="news-tab" data-news-filter="south-africa" type="button">South Africa</button>
-</div>
-<div class="news-meta"><span id="newsStatus">Loading latest financial headlines…</span><span id="newsPortfolioHint">For You follows your selected assets</span></div>
-<div class="news-provider-hint" id="newsProviderHint">Headlines are cached and deduplicated for speed. Refresh only when you explicitly want a new news request.</div>
-<div class="news-grid" id="newsGrid"><div class="catalog-loader"><span></span><p>Loading financial news…</p></div></div>
 </section>
 </section>
 <footer class="app-footer"><strong>Portfolio AI</strong><p>For research and demonstration purposes only. Simulations are not financial advice and do not guarantee future performance.</p></footer>

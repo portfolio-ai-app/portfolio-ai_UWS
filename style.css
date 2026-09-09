@@ -5804,3 +5804,45 @@ body:before{
     }
   }
 }
+
+/* =========================================================
+   NEWS-FIRST ENTRY VIEW
+   Keeps the existing Apple-inspired design language while
+   making Market News the headline experience.
+   ========================================================= */
+#view-news .view-header {
+  position: relative;
+  overflow: hidden;
+}
+
+#view-news .view-header::after {
+  content: "";
+  position: absolute;
+  inset: auto -8% -70% 42%;
+  width: 520px;
+  height: 520px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 113, 227, 0.12), rgba(0, 113, 227, 0) 68%);
+  pointer-events: none;
+}
+
+#view-news .view-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+#view-news #newsViewTitle {
+  max-width: 920px;
+}
+
+#view-news .news-hub-card {
+  margin-top: 18px;
+}
+
+@media (max-width: 760px) {
+  #view-news .view-header::after {
+    width: 360px;
+    height: 360px;
+    inset: auto -35% -45% 35%;
+  }
+}
