@@ -5571,17 +5571,29 @@
     }
 
     var change =
-      Number(quote.percentChange);
+      Number(
+        quote.percentChange !== undefined
+          ? quote.percentChange
+          : quote.percent_change
+      );
 
     if (isFinite(change)) {
       return change;
     }
 
     var previous =
-      Number(quote.previousClose);
+      Number(
+        quote.previousClose !== undefined
+          ? quote.previousClose
+          : quote.previous_close
+      );
 
     var current =
-      Number(quote.price);
+      Number(
+        quote.price !== undefined
+          ? quote.price
+          : quote.close
+      );
 
     if (
       isFinite(previous) &&
@@ -5659,11 +5671,19 @@
     var quote =
       tickerQuoteForAsset(asset);
 
+    var rawPrice =
+      quote
+        ? (
+            quote.price !== undefined
+              ? quote.price
+              : quote.close
+          )
+        : NaN;
+
     var price =
-      quote &&
-      isFinite(Number(quote.price))
+      isFinite(Number(rawPrice))
         ? tickerPrice(
-            quote.price,
+            rawPrice,
             asset.symbol
           )
         : "—";
@@ -5760,6 +5780,107 @@
     );
   }
 
+  function normalizeTickerQuote(data) {
+    if (!data || data.status === "error") {
+      return null;
+    }
+
+    var price =
+      Number(
+        data.close ||
+        data.price ||
+        data.last ||
+        data.value
+      );
+
+    if (!isFinite(price) || price <= 0) {
+      return null;
+    }
+
+    var previousClose =
+      Number(
+        data.previous_close ||
+        data.previousClose ||
+        data.prev_close ||
+        data.previous
+      );
+
+    var percentChange =
+      Number(
+        data.percent_change ||
+        data.percentChange ||
+        data.change_percent
+      );
+
+    if (
+      !isFinite(percentChange) &&
+      isFinite(previousClose) &&
+      previousClose > 0
+    ) {
+      percentChange =
+        ((price - previousClose) /
+        previousClose) * 100;
+    }
+
+    return {
+      price: price,
+      previousClose:
+        isFinite(previousClose)
+          ? previousClose
+          : NaN,
+      percentChange:
+        isFinite(percentChange)
+          ? percentChange
+          : NaN
+    };
+  }
+
+  function fetchSingleTickerQuote(asset) {
+    var params = {
+      symbol: asset.symbol
+    };
+
+    if (
+      asset.exchange &&
+      asset.market !== "Forex" &&
+      asset.market !== "Crypto" &&
+      asset.market !== "Commodities"
+    ) {
+      params.exchange =
+        asset.exchange;
+    }
+
+    return apiRequest(
+      "/quote",
+      params
+    )
+      .then(
+        function (data) {
+          var quote =
+            normalizeTickerQuote(data);
+
+          if (quote) {
+            marketTickerQuotes[
+              asset.symbol
+            ] = quote;
+          }
+
+          return quote;
+        }
+      )
+      .catch(
+        function (error) {
+          console.warn(
+            "Ticker quote failed for " +
+            asset.symbol,
+            error
+          );
+
+          return null;
+        }
+      );
+  }
+
   function fetchMarketTickerQuotes() {
     var refreshButton =
       el("marketTickerRefresh");
@@ -5775,12 +5896,7 @@
     var assets =
       tickerAssetSet();
 
-    var symbols =
-      assets.map(
-        batchSymbolForAsset
-      ).join(",");
-
-    if (!symbols) {
+    if (!assets.length) {
       renderMarketTicker();
 
       if (refreshButton) {
@@ -5794,32 +5910,18 @@
       return Promise.resolve();
     }
 
-    return apiRequest(
-      "/quote",
-      {
-        symbol: symbols
-      }
-    )
-      .then(
-        function (data) {
-          assets.forEach(
-            function (asset) {
-              var quote =
-                parseQuotePayload(
-                  batchLookup(
-                    data,
-                    asset
-                  )
-                );
-
-              if (quote) {
-                marketTickerQuotes[
-                  asset.symbol
-                ] = quote;
-              }
-            }
+    var requests =
+      assets.map(
+        function (asset) {
+          return fetchSingleTickerQuote(
+            asset
           );
+        }
+      );
 
+    return Promise.all(requests)
+      .then(
+        function () {
           renderMarketTicker();
         }
       )
@@ -5865,7 +5967,7 @@
       function () {
         fetchMarketTickerQuotes();
       },
-      900
+      300
     );
 
     if (marketTickerTimer) {
