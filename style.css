@@ -3823,3 +3823,83 @@ footer{color:var(--apple-secondary)}
     top:192px!important;
   }
 }
+
+
+/* =========================================================
+   V21.2 — DARK MODE TICKER BLENDING
+========================================================= */
+
+[data-theme="dark"] .market-pulse-shell{
+  background:#0b0b0d!important;
+  border-top-color:rgba(255,255,255,.07)!important;
+  border-bottom-color:rgba(255,255,255,.08)!important;
+  box-shadow:
+    0 12px 34px rgba(0,0,0,.30),
+    inset 0 1px 0 rgba(255,255,255,.025)!important;
+}
+
+[data-theme="dark"] .market-pulse-head{
+  background:#0b0b0d;
+  border-bottom-color:rgba(255,255,255,.06)!important;
+}
+
+[data-theme="dark"] .market-pulse-tape{
+  background:#0b0b0d!important;
+}
+
+[data-theme="dark"] .market-pulse-widget,
+[data-theme="dark"] .market-pulse-widget .tradingview-widget-container__widget{
+  background:#0b0b0d!important;
+}
+
+[data-theme="dark"] .market-pulse-edge-left{
+  background:linear-gradient(
+    90deg,
+    #0b0b0d 0%,
+    rgba(11,11,13,.92) 42%,
+    transparent 100%
+  )!important;
+}
+
+[data-theme="dark"] .market-pulse-edge-right{
+  background:linear-gradient(
+    270deg,
+    #0b0b0d 0%,
+    rgba(11,11,13,.92) 42%,
+    transparent 100%
+  )!important;
+}
+
+[data-theme="dark"] .market-pulse-chip{
+  border-color:rgba(255,255,255,.08);
+  background:rgba(255,255,255,.035);
+  color:rgba(255,255,255,.58);
+}
+
+[data-theme="dark"] .market-pulse-source,
+[data-theme="dark"] .market-pulse-title small{
+  color:rgba(255,255,255,.48);
+}
+
+/* Keep light mode crisp and intentional. */
+[data-theme="light"] .market-pulse-shell{
+  background:#f5f5f7!important;
+}
+
+[data-theme="light"] .market-pulse-head,
+[data-theme="light"] .market-pulse-tape,
+[data-theme="light"] .market-pulse-widget{
+  background:#f5f5f7!important;
+}
+
+/* If TradingView is briefly rebuilding during theme changes,
+   do not flash a bright placeholder over dark mode. */
+[data-theme="dark"] .market-pulse-placeholder{
+  background:#0b0b0d;
+  color:rgba(255,255,255,.48);
+}
+
+[data-theme="light"] .market-pulse-placeholder{
+  background:#f5f5f7;
+  color:#6e6e73;
+}

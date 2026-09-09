@@ -5522,7 +5522,7 @@
         }
       ],
       showSymbolLogo: true,
-      isTransparent: true,
+      isTransparent: false,
       displayMode: "adaptive",
       theme:
         theme === "dark"
@@ -5532,11 +5532,27 @@
     };
   }
 
-  function syncTradingViewTickerTheme(theme) {
-    var resolvedTheme =
-      theme === "dark"
+  function resolvedPortfolioTheme(theme) {
+    var current =
+      theme ||
+      document.documentElement.getAttribute(
+        "data-theme"
+      ) ||
+      document.body.getAttribute(
+        "data-theme"
+      ) ||
+      getPreferredTheme();
+
+    return String(current)
+      .toLowerCase()
+      .indexOf("dark") >= 0
         ? "dark"
         : "light";
+  }
+
+  function syncTradingViewTickerTheme(theme) {
+    var resolvedTheme =
+      resolvedPortfolioTheme(theme);
 
     if (
       tradingViewTickerTheme ===
@@ -5632,14 +5648,17 @@
       ) ||
       getPreferredTheme();
 
+    currentTheme =
+      resolvedPortfolioTheme(
+        currentTheme
+      );
+
     renderTradingViewTicker(
       currentTheme
     );
 
     tradingViewTickerTheme =
-      currentTheme === "dark"
-        ? "dark"
-        : "light";
+      currentTheme;
   }
 
   var APP_VIEW_STORAGE_KEY =
