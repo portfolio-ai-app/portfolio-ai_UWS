@@ -4539,3 +4539,139 @@ nav .active{
     animation:none!important
   }
 }
+
+
+/* =========================================================
+   V25 — FULL APP iOS-STYLE LIQUID GLASS + MOTION SYSTEM
+========================================================= */
+:root{
+  --ios-ease:cubic-bezier(.22,.8,.2,1);
+  --ios-spring:cubic-bezier(.2,1.15,.25,1);
+  --ios-glass:rgba(255,255,255,.54);
+  --ios-stroke:rgba(255,255,255,.60);
+  --ios-shadow:0 18px 55px rgba(15,25,45,.12),0 2px 7px rgba(15,25,45,.04),inset 0 1px 0 rgba(255,255,255,.75);
+}
+[data-theme="dark"],body.dark{
+  --ios-glass:rgba(18,18,23,.50);
+  --ios-stroke:rgba(255,255,255,.10);
+  --ios-shadow:0 24px 70px rgba(0,0,0,.34),0 2px 8px rgba(0,0,0,.16),inset 0 1px 0 rgba(255,255,255,.08);
+}
+body:before{
+  content:"";position:fixed;inset:0;z-index:-3;pointer-events:none;
+  background:
+    radial-gradient(circle at 18% 10%,rgba(0,122,255,.13),transparent 30%),
+    radial-gradient(circle at 78% 15%,rgba(94,92,230,.11),transparent 32%),
+    radial-gradient(circle at 62% 85%,rgba(52,199,89,.07),transparent 28%);
+  animation:iosAmbient 18s ease-in-out infinite alternate
+}
+@keyframes iosAmbient{
+  0%{transform:scale(1) translate3d(0,0,0)}
+  100%{transform:scale(1.06) translate3d(1.5%,-1%,0)}
+}
+
+/* Floating navigation shell + moving glass lens */
+.app-nav,nav{
+  position:relative!important;
+  overflow:visible!important;
+  border:1px solid var(--ios-stroke)!important;
+  background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,.035)),var(--ios-glass)!important;
+  box-shadow:var(--ios-shadow)!important;
+  -webkit-backdrop-filter:blur(34px) saturate(180%)!important;
+  backdrop-filter:blur(34px) saturate(180%)!important;
+  transform:translateZ(0)
+}
+.app-nav:before,nav:before{
+  content:"";position:absolute;left:6%;right:6%;top:0;height:1px;border-radius:999px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.82),transparent);pointer-events:none
+}
+.ios-nav-lens{
+  position:absolute;left:0;top:0;z-index:0;border-radius:999px;
+  background:linear-gradient(180deg,rgba(255,255,255,.78),rgba(255,255,255,.48));
+  border:1px solid rgba(255,255,255,.80);
+  box-shadow:0 7px 22px rgba(25,35,55,.14),inset 0 1px 0 rgba(255,255,255,.95);
+  transition:transform .46s var(--ios-spring),width .46s var(--ios-spring),height .46s var(--ios-spring);
+  pointer-events:none
+}
+[data-theme="dark"] .ios-nav-lens{
+  background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.06));
+  border-color:rgba(255,255,255,.12);
+  box-shadow:0 9px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.10)
+}
+.app-nav [data-app-view],nav [data-app-view]{
+  position:relative;z-index:1;background:transparent!important;
+  transition:color .3s ease,transform .3s var(--ios-spring)
+}
+.app-nav [data-app-view].active,nav [data-app-view].active{box-shadow:none!important}
+
+/* Directional push/pop page transitions */
+.app-view{will-change:transform,opacity,filter;transform-origin:50% 35%}
+.app-view.view-enter-right{animation:iosPushInRight .52s var(--ios-ease) both}
+.app-view.view-enter-left{animation:iosPushInLeft .52s var(--ios-ease) both}
+.app-view.view-exit-left{animation:iosPushOutLeft .52s var(--ios-ease) both}
+.app-view.view-exit-right{animation:iosPushOutRight .52s var(--ios-ease) both}
+@keyframes iosPushInRight{0%{opacity:0;transform:translate3d(48px,0,0) scale(.985);filter:blur(8px)}45%{opacity:1}100%{opacity:1;transform:none;filter:blur(0)}}
+@keyframes iosPushInLeft{0%{opacity:0;transform:translate3d(-48px,0,0) scale(.985);filter:blur(8px)}45%{opacity:1}100%{opacity:1;transform:none;filter:blur(0)}}
+@keyframes iosPushOutLeft{0%{opacity:1;transform:none;filter:blur(0)}100%{opacity:0;transform:translate3d(-34px,0,0) scale(.985);filter:blur(7px)}}
+@keyframes iosPushOutRight{0%{opacity:1;transform:none;filter:blur(0)}100%{opacity:0;transform:translate3d(34px,0,0) scale(.985);filter:blur(7px)}}
+
+/* Whole-app living glass */
+.card,.panel,.portfolio-card,.news-card,.ai-card,.trade-planner-card,
+.premium-intelligence,.capital-check-card,.trade-duck-summary,
+.premium-snapshot-grid article,.trade-size-recommendation{
+  background:linear-gradient(145deg,rgba(255,255,255,.18),rgba(255,255,255,.035)),var(--ios-glass)!important;
+  border:1px solid var(--ios-stroke)!important;
+  box-shadow:var(--ios-shadow)!important;
+  -webkit-backdrop-filter:blur(34px) saturate(175%)!important;
+  backdrop-filter:blur(34px) saturate(175%)!important;
+  transition:transform .38s var(--ios-spring),box-shadow .38s ease,border-color .38s ease,background .38s ease!important
+}
+@media(hover:hover){
+  .card:hover,.panel:hover,.portfolio-card:hover,.news-card:hover,.ai-card:hover,
+  .premium-snapshot-grid article:hover,.trade-duck-grid article:hover{
+    transform:translateY(-4px) scale(1.006);
+    box-shadow:0 28px 78px rgba(18,28,50,.15),inset 0 1px 0 rgba(255,255,255,.75)!important
+  }
+}
+.ios-press{animation:iosPress .28s var(--ios-spring)!important}
+@keyframes iosPress{0%{transform:scale(1)}45%{transform:scale(.965)}100%{transform:scale(1)}}
+
+/* Staggered content reveal */
+.app-view.active > *,.app-view.is-active > *{animation:sectionLift .56s var(--ios-ease) both}
+.app-view.active > *:nth-child(2),.app-view.is-active > *:nth-child(2){animation-delay:.035s}
+.app-view.active > *:nth-child(3),.app-view.is-active > *:nth-child(3){animation-delay:.07s}
+.app-view.active > *:nth-child(4),.app-view.is-active > *:nth-child(4){animation-delay:.105s}
+.app-view.active > *:nth-child(5),.app-view.is-active > *:nth-child(5){animation-delay:.14s}
+@keyframes sectionLift{from{opacity:0;transform:translateY(13px) scale(.992)}to{opacity:1;transform:none}}
+
+/* Ask AI becomes a floating iOS-like dock */
+#aiQuestionForm{
+  position:relative;padding:6px;border-radius:24px;
+  background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.04)),var(--ios-glass)!important;
+  border:1px solid var(--ios-stroke)!important;
+  box-shadow:var(--ios-shadow)!important;
+  -webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%)
+}
+#aiQuestion{
+  background:rgba(127,127,127,.07)!important;
+  border:1px solid rgba(127,127,127,.12)!important;
+  transition:box-shadow .28s ease,border-color .28s ease,background .28s ease!important
+}
+#aiQuestion:focus{
+  background:rgba(127,127,127,.045)!important;
+  border-color:rgba(0,122,255,.35)!important;
+  box-shadow:0 0 0 5px rgba(0,122,255,.10)!important
+}
+#aiAnswer{animation:aiAnswerIn .45s var(--ios-ease) both}
+@keyframes aiAnswerIn{from{opacity:0;transform:translateY(8px) scale(.992);filter:blur(5px)}to{opacity:1;transform:none;filter:blur(0)}}
+
+@media(max-width:700px){
+  .app-view.view-enter-right{animation-name:iosMobileInRight}
+  .app-view.view-enter-left{animation-name:iosMobileInLeft}
+  @keyframes iosMobileInRight{from{opacity:.3;transform:translate3d(14%,0,0) scale(.99)}to{opacity:1;transform:none}}
+  @keyframes iosMobileInLeft{from{opacity:.3;transform:translate3d(-14%,0,0) scale(.99)}to{opacity:1;transform:none}}
+}
+@media(prefers-reduced-motion:reduce){
+  .app-view.view-enter-right,.app-view.view-enter-left,.app-view.view-exit-left,.app-view.view-exit-right,
+  .app-view.active > *,.app-view.is-active > *,body:before,.ios-press{animation:none!important}
+  .ios-nav-lens{transition:none!important}
+}

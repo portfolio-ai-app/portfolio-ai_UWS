@@ -2536,7 +2536,7 @@
       '</div>';
   }
 
-  function answerAIQuestion(question) {
+  function answerAIQuestionGeneric(question) {
     var state = buildAIState();
     var text = String(question || "").toLowerCase();
 
@@ -2674,6 +2674,105 @@
       " Ask me about the strongest setup, whether the assets should be traded together, the main risk, or the current directional bias."
     );
   }
+
+function moneyQuestionKind(question) {
+  var q = String(question || "").toLowerCase();
+  return (
+    q.indexOf("how much") >= 0 ||
+    q.indexOf("enough") >= 0 ||
+    q.indexOf("afford") >= 0 ||
+    q.indexOf("capital") >= 0 ||
+    q.indexOf("profit") >= 0 ||
+    q.indexOf("make money") >= 0 ||
+    q.indexOf("real money") >= 0 ||
+    q.indexOf("significant") >= 0 ||
+    q.indexOf("add") >= 0 ||
+    q.indexOf("need") >= 0 ||
+    q.indexOf("worth") >= 0
+  );
+}
+
+function extractDollarAmount(question) {
+  var q = String(question || "");
+  var m = q.match(/\$?\s*([0-9]+(?:\.[0-9]+)?)(?:\s*(k|K))?/);
+  if (!m) return null;
+  var n = Number(m[1]);
+  if (!isFinite(n)) return null;
+  if (m[2]) n = n * 1000;
+  return n;
+}
+
+function plainMoney(v) {
+  var n = Number(v);
+  if (!isFinite(n)) return "$0";
+  return "$" + Math.round(n).toLocaleString("en-US");
+}
+
+function answerMoneyQuestion(question) {
+  var d = capitalAdequacyData();
+  var capital = Number(d.capital || capitalNumber("investment", 0));
+  var amountInQuestion = extractDollarAmount(question);
+  var q = String(question || "").toLowerCase();
+
+  if (!capital || capital <= 0) {
+    return "Enter your portfolio amount first. Then I can answer in actual USD amounts instead of percentages.";
+  }
+
+  var targetPractical = Number(d.minimum || 0);
+  var targetComfort = Number(d.comfortable || 0);
+  var selectedCount = Number(d.count || (selectedAssets ? selectedAssets.length : 0));
+
+  if (q.indexOf("add") >= 0 && amountInQuestion !== null) {
+    var newTotal = capital + amountInQuestion;
+    var verdict = targetPractical > 0 && newTotal >= targetPractical
+      ? "That would put the portfolio into a more practical capital range for the assets you selected."
+      : "That helps, but the portfolio would still be capital-constrained for the assets you selected.";
+    return "Add " + plainMoney(amountInQuestion) + " and your portfolio goes from " + plainMoney(capital) + " to " + plainMoney(newTotal) + ". " + verdict;
+  }
+
+  if (q.indexOf("profit") >= 0 && amountInQuestion !== null && (q.indexOf("make") >= 0 || q.indexOf("need") >= 0)) {
+    var p5 = amountInQuestion / 0.05;
+    var p10 = amountInQuestion / 0.10;
+    var p20 = amountInQuestion / 0.20;
+    return "To make about " + plainMoney(amountInQuestion) + " profit, the capital needed depends on the market move. Rough guide: 5% gain -> about " + plainMoney(p5) + " capital; 10% gain -> about " + plainMoney(p10) + "; 20% gain -> about " + plainMoney(p20) + ". There is no capital amount that guarantees that profit.";
+  }
+
+  if (q.indexOf("significant") >= 0 || q.indexOf("real money") >= 0 || q.indexOf("make money") >= 0 || q.indexOf("profit") >= 0) {
+    var next1 = Math.max(capital * 2, 500);
+    var next2 = Math.max(capital * 4, 1000);
+    if (targetPractical > capital) next1 = Math.max(next1, targetPractical);
+    if (targetComfort > capital) next2 = Math.max(next2, targetComfort);
+
+    return "With " + plainMoney(capital) + ", your dollar gains will naturally be small unless the asset makes a very large move. At a 10% gain: " + plainMoney(capital) + " makes about " + plainMoney(capital * 0.10) + "; " + plainMoney(next1) + " makes about " + plainMoney(next1 * 0.10) + "; " + plainMoney(next2) + " makes about " + plainMoney(next2 * 0.10) + ". If you want a more noticeable dollar impact, a sensible next capital step is around " + plainMoney(next1) + ". That is not a profit guarantee; it simply makes the same percentage move worth more dollars.";
+  }
+
+  if (targetPractical > 0) {
+    if (capital >= targetPractical) {
+      var room = Math.max(0, targetComfort - capital);
+      if (room > 0) {
+        return "Your " + plainMoney(capital) + " is enough for this selected portfolio. You do not need to add more to make it practical. About " + plainMoney(room) + " more would only give you extra breathing room.";
+      }
+      return "Your " + plainMoney(capital) + " is already enough for this selected portfolio. You do not need to add more just to make it practical.";
+    }
+
+    var add = Math.max(0, targetPractical - capital);
+    return "Add about " + plainMoney(add) + " more. That takes you from " + plainMoney(capital) + " to about " + plainMoney(targetPractical) + ", where this selected portfolio becomes more practical.";
+  }
+
+  if (selectedCount) {
+    return "You currently have " + plainMoney(capital) + " across " + selectedCount + " selected asset" + (selectedCount === 1 ? "" : "s") + ". Run the analysis and I will give you an exact USD add-on.";
+  }
+
+  return "You currently have " + plainMoney(capital) + ". Select the asset or portfolio you want to test and I will answer in exact USD amounts.";
+}
+
+function answerAIQuestion(question) {
+  if (moneyQuestionKind(question)) {
+    return answerMoneyQuestion(question);
+  }
+  return answerAIQuestionGeneric(question);
+}
+
 
   function submitAIQuestion(question) {
     var answer = el("aiAnswer");
@@ -6138,100 +6237,112 @@
     view.classList.add("view-enter");
   }
 
-  var APP_VIEW_STORAGE_KEY =
+  
+function attachIOSMotion() {
+  document.addEventListener("pointerdown", function(e){
+    var button = e.target.closest("button,[data-app-view],.premium-snapshot-grid article,.trade-duck-grid article");
+    if (!button) return;
+    button.classList.remove("ios-press");
+    void button.offsetWidth;
+    button.classList.add("ios-press");
+    window.setTimeout(function(){ button.classList.remove("ios-press"); }, 280);
+  });
+
+  var nav = document.querySelector(".app-nav") || document.querySelector("nav");
+  if (nav && !nav.querySelector(".ios-nav-lens")) {
+    var lens = document.createElement("span");
+    lens.className = "ios-nav-lens";
+    nav.appendChild(lens);
+
+    function moveLens() {
+      var active = nav.querySelector("[data-app-view].active");
+      if (!active) return;
+      var nr = nav.getBoundingClientRect();
+      var ar = active.getBoundingClientRect();
+      lens.style.width = ar.width + "px";
+      lens.style.height = ar.height + "px";
+      lens.style.transform = "translate3d(" + (ar.left - nr.left) + "px," + (ar.top - nr.top) + "px,0)";
+    }
+
+    window.addEventListener("resize", moveLens);
+    document.addEventListener("click", function(e){
+      if (e.target.closest("[data-app-view]")) {
+        window.setTimeout(moveLens, 20);
+      }
+    });
+    window.setTimeout(moveLens, 120);
+  }
+}
+
+var APP_VIEW_STORAGE_KEY =
     "portfolio-ai-active-view";
 
-  function setAppView(viewName, options) {
-    options = options || {};
+  
+var appViewOrder = ["overview","portfolio","intelligence","trade","news"];
+var currentAnimatedView = null;
 
-    var allowed = {
-      overview: true,
-      portfolio: true,
-      intelligence: true,
-      trade: true,
-      news: true
-    };
+function viewIndex(name) {
+  var i = appViewOrder.indexOf(String(name || "").toLowerCase());
+  return i < 0 ? 0 : i;
+}
 
-    if (!allowed[viewName]) {
-      viewName = "overview";
-    }
+function setAppView(viewName) {
+  var name = String(viewName || "overview").toLowerCase();
+  var views = document.querySelectorAll(".app-view");
+  var next = document.querySelector('[data-view="' + name + '"]');
+  var previous = currentAnimatedView
+    ? document.querySelector('[data-view="' + currentAnimatedView + '"]')
+    : document.querySelector(".app-view.active,.app-view.is-active,.app-view:not([hidden])");
 
-    var views =
-      document.querySelectorAll(
-        ".app-view"
-      );
+  if (!next) return;
 
-    Array.prototype.forEach.call(
-      views,
-      function (view) {
-        var active =
-          view.getAttribute(
-            "data-view"
-          ) === viewName;
+  var direction = viewIndex(name) >= viewIndex(currentAnimatedView || name) ? 1 : -1;
 
-        view.classList.toggle(
-          "active",
-          active
-        );
+  if (previous && previous !== next) {
+    previous.hidden = false;
+    previous.classList.remove("view-enter","view-enter-left","view-enter-right","view-exit-left","view-exit-right");
+    previous.classList.add(direction > 0 ? "view-exit-left" : "view-exit-right");
 
-        view.setAttribute(
-          "aria-hidden",
-          active ? "false" : "true"
-        );
-      }
-    );
+    next.hidden = false;
+    next.classList.remove("view-enter","view-enter-left","view-enter-right","view-exit-left","view-exit-right");
+    next.classList.add(direction > 0 ? "view-enter-right" : "view-enter-left");
 
-    var navItems =
-      document.querySelectorAll(
-        ".app-nav-item"
-      );
-
-    Array.prototype.forEach.call(
-      navItems,
-      function (button) {
-        var active =
-          button.getAttribute(
-            "data-app-view"
-          ) === viewName;
-
-        button.classList.toggle(
-          "active",
-          active
-        );
-
-        button.setAttribute(
-          "aria-current",
-          active ? "page" : "false"
-        );
-      }
-    );
-
-    try {
-      localStorage.setItem(
-        APP_VIEW_STORAGE_KEY,
-        viewName
-      );
-    } catch (error) {}
-
-    if (
-      options.scroll !== false
-    ) {
-      window.scrollTo({
-        top: 0,
-        behavior:
-          options.instant
-            ? "auto"
-            : "smooth"
+    window.setTimeout(function(){
+      views.forEach(function(v){
+        var active = v === next;
+        v.classList.toggle("active", active);
+        v.classList.toggle("is-active", active);
+        if (!active) {
+          v.hidden = true;
+          v.classList.remove("view-enter-left","view-enter-right","view-exit-left","view-exit-right");
+        }
       });
-    }
-
-    if (
-      viewName === "news" &&
-      !newsLoading
-    ) {
-      loadNews(false);
-    }
+      next.classList.remove("view-enter-left","view-enter-right");
+    }, 520);
+  } else {
+    views.forEach(function(v){
+      var active = v === next;
+      v.classList.toggle("active", active);
+      v.classList.toggle("is-active", active);
+      v.hidden = !active;
+    });
   }
+
+  currentAnimatedView = name;
+
+  document.querySelectorAll("[data-app-view]").forEach(function(btn){
+    btn.classList.toggle("active", btn.getAttribute("data-app-view") === name);
+  });
+
+  try {
+    localStorage.setItem("portfolio-ai-active-view", name);
+  } catch (e) {}
+
+  if (name === "trade") {
+    window.setTimeout(updateTradeDuckSummary, 120);
+  }
+}
+
 
   function restoreAppView() {
     var saved = "overview";
@@ -6905,6 +7016,7 @@
     attachMarketTicker();
     attachPremiumIntelligence();
   attachTradeBeginnerMode();
+  attachIOSMotion();
   updateTradeDuckSummary();
   updateCapitalSimpleAnswer();
     restoreAppView();
