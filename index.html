@@ -30,6 +30,30 @@
 </button>
 </div>
 </nav>
+
+<div class="market-ticker-shell" aria-label="Live market prices">
+  <div class="market-ticker-label">
+    <span class="ticker-live-dot"></span>
+    <strong>Markets</strong>
+  </div>
+
+  <div class="market-ticker-window">
+    <div id="marketTickerTrack" class="market-ticker-track">
+      <div class="market-ticker-loading">
+        Loading latest prices…
+      </div>
+    </div>
+  </div>
+
+  <button
+    id="marketTickerRefresh"
+    class="market-ticker-refresh"
+    type="button"
+    title="Refresh market strip"
+    aria-label="Refresh market strip"
+  >↻</button>
+</div>
+
 <nav class="app-navigation" aria-label="Primary">
   <button type="button" class="app-nav-item active" data-app-view="overview">
     <span class="app-nav-icon">⌂</span><span>Overview</span>

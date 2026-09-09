@@ -3293,3 +3293,233 @@ footer{color:var(--apple-secondary)}
     width:100%;
   }
 }
+
+
+/* =========================================================
+   V20 — LIVE MARKET TICKER STRIP
+========================================================= */
+
+.market-ticker-shell{
+  position:sticky;
+  top:58px;
+  z-index:117;
+  display:grid;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  align-items:center;
+  min-height:42px;
+  border-top:1px solid var(--apple-hairline);
+  border-bottom:1px solid var(--apple-hairline);
+  background:color-mix(in srgb,var(--apple-card-solid) 90%,transparent);
+  backdrop-filter:saturate(180%) blur(22px);
+  -webkit-backdrop-filter:saturate(180%) blur(22px);
+}
+
+.market-ticker-label{
+  position:relative;
+  z-index:3;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  height:100%;
+  padding:0 16px 0 20px;
+  border-right:1px solid var(--apple-hairline);
+  background:color-mix(in srgb,var(--apple-card-solid) 94%,transparent);
+  color:var(--apple-text);
+}
+
+.market-ticker-label strong{
+  font-size:10px;
+  letter-spacing:.02em;
+}
+
+.ticker-live-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#30d158;
+  box-shadow:0 0 0 4px rgba(48,209,88,.11);
+}
+
+.market-ticker-window{
+  min-width:0;
+  overflow:hidden;
+  mask-image:linear-gradient(
+    90deg,
+    transparent 0,
+    #000 24px,
+    #000 calc(100% - 24px),
+    transparent 100%
+  );
+  -webkit-mask-image:linear-gradient(
+    90deg,
+    transparent 0,
+    #000 24px,
+    #000 calc(100% - 24px),
+    transparent 100%
+  );
+}
+
+.market-ticker-track{
+  display:flex;
+  align-items:center;
+  width:max-content;
+  min-width:100%;
+  min-height:40px;
+}
+
+.market-ticker-track.is-moving{
+  animation:marketTickerScroll 38s linear infinite;
+}
+
+.market-ticker-shell:hover .market-ticker-track.is-moving{
+  animation-play-state:paused;
+}
+
+@keyframes marketTickerScroll{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+
+.market-ticker-group{
+  display:flex;
+  align-items:center;
+  flex:0 0 auto;
+}
+
+.market-ticker-item{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex:0 0 auto;
+  min-height:40px;
+  padding:0 16px;
+  border-right:1px solid var(--apple-hairline);
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+
+.market-ticker-symbol{
+  color:var(--apple-text);
+  font-size:10px;
+  font-weight:750;
+  letter-spacing:.01em;
+}
+
+.market-ticker-price{
+  color:var(--apple-text);
+  font-size:10px;
+  font-weight:600;
+}
+
+.market-ticker-change{
+  display:inline-flex;
+  align-items:center;
+  gap:3px;
+  font-size:9px;
+  font-weight:750;
+}
+
+.market-ticker-change.up{
+  color:#1d9b51;
+}
+
+.market-ticker-change.down{
+  color:#d70015;
+}
+
+.market-ticker-change.flat{
+  color:var(--apple-secondary);
+}
+
+.market-ticker-arrow{
+  font-size:9px;
+  line-height:1;
+}
+
+.market-ticker-loading{
+  padding:0 18px;
+  color:var(--apple-secondary);
+  font-size:10px;
+}
+
+.market-ticker-refresh{
+  appearance:none;
+  border:0;
+  border-left:1px solid var(--apple-hairline);
+  display:grid;
+  place-items:center;
+  width:44px;
+  height:40px;
+  background:color-mix(in srgb,var(--apple-card-solid) 94%,transparent);
+  color:var(--apple-secondary);
+  font-family:inherit;
+  font-size:15px;
+  cursor:pointer;
+  transition:color .16s ease,background .16s ease,transform .16s ease;
+}
+
+.market-ticker-refresh:hover{
+  color:var(--apple-text);
+  background:rgba(127,127,127,.08);
+}
+
+.market-ticker-refresh.is-loading{
+  animation:tickerRefreshSpin .8s linear infinite;
+}
+
+@keyframes tickerRefreshSpin{
+  to{transform:rotate(360deg)}
+}
+
+/* The primary app navigation now sits immediately beneath the ticker. */
+.app-navigation{
+  top:100px;
+}
+
+/* Sticky selected portfolio must clear nav + ticker. */
+.portfolio-freeze-shell.is-frozen{
+  top:158px;
+}
+
+@media(max-width:700px){
+  .market-ticker-shell{
+    top:60px;
+    min-height:40px;
+  }
+
+  .market-ticker-label{
+    padding:0 10px;
+  }
+
+  .market-ticker-label strong{
+    display:none;
+  }
+
+  .market-ticker-item{
+    padding:0 12px;
+  }
+
+  .market-ticker-refresh{
+    width:38px;
+  }
+
+  .app-navigation{
+    top:100px;
+  }
+
+  .portfolio-freeze-shell.is-frozen{
+    top:154px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  .market-ticker-track.is-moving{
+    animation:none;
+  }
+
+  .market-ticker-window{
+    overflow-x:auto;
+    mask-image:none;
+    -webkit-mask-image:none;
+  }
+}

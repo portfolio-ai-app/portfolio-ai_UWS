@@ -1201,6 +1201,8 @@
     if (!selectedAssets.length) {
       tray.innerHTML = '<div class="selection-placeholder">Your selected assets will appear here</div>';
       updateOverview();
+    renderMarketTicker();
+      renderMarketTicker();
       return;
     }
 
@@ -1903,6 +1905,7 @@
 
     container.innerHTML = html;
     updateOverview();
+    renderMarketTicker();
   }
 
   /* ========================= STATISTICS ========================= */
@@ -5484,6 +5487,407 @@
 
 
 
+
+  var MARKET_TICKER_REFRESH_MS =
+    30 * 60 * 1000;
+
+  var marketTickerTimer = null;
+
+  var marketTickerAssets = [
+    {
+      symbol: "SPY",
+      market: "ETFs",
+      exchange: "NYSE ARCA",
+      key: "ticker-SPY",
+      label: "SPY"
+    },
+    {
+      symbol: "QQQ",
+      market: "ETFs",
+      exchange: "NASDAQ",
+      key: "ticker-QQQ",
+      label: "QQQ"
+    },
+    {
+      symbol: "EUR/USD",
+      market: "Forex",
+      key: "ticker-EURUSD",
+      label: "EUR/USD"
+    },
+    {
+      symbol: "USD/ZAR",
+      market: "Forex",
+      key: "ticker-USDZAR",
+      label: "USD/ZAR"
+    },
+    {
+      symbol: "BTC/USD",
+      market: "Crypto",
+      key: "ticker-BTCUSD",
+      label: "BTC/USD"
+    },
+    {
+      symbol: "XAU/USD",
+      market: "Commodities",
+      key: "ticker-XAUUSD",
+      label: "XAU/USD"
+    }
+  ];
+
+  var marketTickerQuotes = {};
+
+  function tickerPrice(value, symbol) {
+    var number = Number(value);
+
+    if (!isFinite(number)) {
+      return "—";
+    }
+
+    var decimals = 2;
+
+    if (
+      symbol.indexOf("/") >= 0 &&
+      number < 10
+    ) {
+      decimals = 4;
+    }
+
+    if (number < 1) {
+      decimals = 5;
+    }
+
+    return number.toLocaleString(
+      "en-US",
+      {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals
+      }
+    );
+  }
+
+  function tickerChangeValue(quote) {
+    if (!quote) {
+      return NaN;
+    }
+
+    var change =
+      Number(quote.percentChange);
+
+    if (isFinite(change)) {
+      return change;
+    }
+
+    var previous =
+      Number(quote.previousClose);
+
+    var current =
+      Number(quote.price);
+
+    if (
+      isFinite(previous) &&
+      previous > 0 &&
+      isFinite(current)
+    ) {
+      return (
+        (current - previous) /
+        previous
+      ) * 100;
+    }
+
+    return NaN;
+  }
+
+  function tickerAssetSet() {
+    var merged = [];
+    var seen = {};
+
+    selectedAssets.forEach(
+      function (asset) {
+        if (
+          !asset ||
+          !asset.symbol ||
+          seen[asset.symbol]
+        ) {
+          return;
+        }
+
+        seen[asset.symbol] = true;
+
+        merged.push({
+          symbol: asset.symbol,
+          market: asset.market,
+          exchange: asset.exchange || "",
+          key: asset.key,
+          label: asset.symbol
+        });
+      }
+    );
+
+    marketTickerAssets.forEach(
+      function (asset) {
+        if (
+          !seen[asset.symbol]
+        ) {
+          seen[asset.symbol] = true;
+          merged.push(asset);
+        }
+      }
+    );
+
+    return merged.slice(0, 10);
+  }
+
+  function tickerQuoteForAsset(asset) {
+    var analysis =
+      marketData[asset.key];
+
+    if (
+      analysis &&
+      analysis.quote
+    ) {
+      return analysis.quote;
+    }
+
+    return (
+      marketTickerQuotes[
+        asset.symbol
+      ] || null
+    );
+  }
+
+  function marketTickerItemHTML(asset) {
+    var quote =
+      tickerQuoteForAsset(asset);
+
+    var price =
+      quote &&
+      isFinite(Number(quote.price))
+        ? tickerPrice(
+            quote.price,
+            asset.symbol
+          )
+        : "—";
+
+    var change =
+      tickerChangeValue(quote);
+
+    var changeClass = "flat";
+    var arrow = "•";
+    var changeText = "—";
+
+    if (isFinite(change)) {
+      if (change > 0.005) {
+        changeClass = "up";
+        arrow = "▲";
+      } else if (change < -0.005) {
+        changeClass = "down";
+        arrow = "▼";
+      }
+
+      changeText =
+        Math.abs(change).toFixed(2) +
+        "%";
+    }
+
+    return (
+      '<div class="market-ticker-item">' +
+        '<span class="market-ticker-symbol">' +
+          escapeHTML(
+            asset.label ||
+            asset.symbol
+          ) +
+        '</span>' +
+        '<span class="market-ticker-price">' +
+          escapeHTML(price) +
+        '</span>' +
+        '<span class="market-ticker-change ' +
+          changeClass +
+        '">' +
+          '<span class="market-ticker-arrow">' +
+            arrow +
+          '</span>' +
+          '<span>' +
+            escapeHTML(changeText) +
+          '</span>' +
+        '</span>' +
+      '</div>'
+    );
+  }
+
+  function renderMarketTicker() {
+    var track =
+      el("marketTickerTrack");
+
+    if (!track) {
+      return;
+    }
+
+    var assets =
+      tickerAssetSet();
+
+    if (!assets.length) {
+      track.classList.remove(
+        "is-moving"
+      );
+
+      track.innerHTML =
+        '<div class="market-ticker-loading">' +
+        'Market prices will appear here.' +
+        '</div>';
+
+      return;
+    }
+
+    var groupHTML = "";
+
+    assets.forEach(
+      function (asset) {
+        groupHTML +=
+          marketTickerItemHTML(asset);
+      }
+    );
+
+    track.innerHTML =
+      '<div class="market-ticker-group">' +
+        groupHTML +
+      '</div>' +
+      '<div class="market-ticker-group" aria-hidden="true">' +
+        groupHTML +
+      '</div>';
+
+    track.classList.add(
+      "is-moving"
+    );
+  }
+
+  function fetchMarketTickerQuotes() {
+    var refreshButton =
+      el("marketTickerRefresh");
+
+    if (refreshButton) {
+      refreshButton.classList.add(
+        "is-loading"
+      );
+
+      refreshButton.disabled = true;
+    }
+
+    var assets =
+      tickerAssetSet();
+
+    var symbols =
+      assets.map(
+        batchSymbolForAsset
+      ).join(",");
+
+    if (!symbols) {
+      renderMarketTicker();
+
+      if (refreshButton) {
+        refreshButton.classList.remove(
+          "is-loading"
+        );
+
+        refreshButton.disabled = false;
+      }
+
+      return Promise.resolve();
+    }
+
+    return apiRequest(
+      "/quote",
+      {
+        symbol: symbols
+      }
+    )
+      .then(
+        function (data) {
+          assets.forEach(
+            function (asset) {
+              var quote =
+                parseQuotePayload(
+                  batchLookup(
+                    data,
+                    asset
+                  )
+                );
+
+              if (quote) {
+                marketTickerQuotes[
+                  asset.symbol
+                ] = quote;
+              }
+            }
+          );
+
+          renderMarketTicker();
+        }
+      )
+      .catch(
+        function (error) {
+          console.warn(
+            "Market ticker refresh failed.",
+            error
+          );
+
+          renderMarketTicker();
+        }
+      )
+      .then(
+        function () {
+          if (refreshButton) {
+            refreshButton.classList.remove(
+              "is-loading"
+            );
+
+            refreshButton.disabled = false;
+          }
+        }
+      );
+  }
+
+  function attachMarketTicker() {
+    var refreshButton =
+      el("marketTickerRefresh");
+
+    if (refreshButton) {
+      refreshButton.addEventListener(
+        "click",
+        function () {
+          fetchMarketTickerQuotes();
+        }
+      );
+    }
+
+    renderMarketTicker();
+
+    window.setTimeout(
+      function () {
+        fetchMarketTickerQuotes();
+      },
+      900
+    );
+
+    if (marketTickerTimer) {
+      window.clearInterval(
+        marketTickerTimer
+      );
+    }
+
+    marketTickerTimer =
+      window.setInterval(
+        function () {
+          if (
+            document.visibilityState ===
+            "visible"
+          ) {
+            fetchMarketTickerQuotes();
+          }
+        },
+        MARKET_TICKER_REFRESH_MS
+      );
+  }
+
   var APP_VIEW_STORAGE_KEY =
     "portfolio-ai-active-view";
 
@@ -6248,6 +6652,7 @@
     attachEvents();
     attachAppleUX();
     attachAppNavigation();
+    attachMarketTicker();
     restoreAppView();
     restorePortfolioFrozen();
     setStatus("Ready", "ready");
