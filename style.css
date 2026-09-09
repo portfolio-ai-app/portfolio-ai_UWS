@@ -5277,3 +5277,185 @@ body:before{
     font-size:7px!important;
   }
 }
+
+
+/* =========================================================
+   V25.7 — MODERN SYSTEM NAVIGATION
+   Quiet typography + optical vector symbols
+========================================================= */
+
+.app-navigation,
+.app-navigation button,
+.app-navigation .app-nav-label{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI",Roboto,Helvetica,Arial,sans-serif!important;
+  font-synthesis:none!important;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+/* Typography: deliberately NOT bold. */
+.app-navigation .app-nav-item{
+  font-size:12px!important;
+  font-weight:500!important;
+  letter-spacing:-.012em!important;
+  color:rgba(60,60,67,.68)!important;
+}
+.app-navigation .app-nav-item.active{
+  font-weight:600!important;
+  color:rgba(22,22,24,.96)!important;
+}
+[data-theme="dark"] .app-navigation .app-nav-item{
+  color:rgba(235,235,245,.58)!important;
+}
+[data-theme="dark"] .app-navigation .app-nav-item.active{
+  color:rgba(255,255,255,.96)!important;
+}
+
+/* Remove the old active underline and decorative glow. The glass lens is the selection. */
+.app-navigation .app-nav-item.active:after{
+  display:none!important;
+}
+.app-navigation .app-nav-item.active .ios-nav-icon:before{
+  display:none!important;
+}
+
+/* Optical icon system */
+.app-navigation .ios-nav-icon{
+  position:relative!important;
+  display:grid!important;
+  place-items:center!important;
+  width:18px!important;
+  height:18px!important;
+  flex:0 0 18px!important;
+  opacity:.64!important;
+  transform:none!important;
+  background:none!important;
+  box-shadow:none!important;
+  border:0!important;
+  transition:
+    opacity .26s ease,
+    transform .44s cubic-bezier(.2,.95,.25,1)!important;
+}
+.app-navigation .ios-nav-icon svg{
+  display:block!important;
+  width:18px!important;
+  height:18px!important;
+  overflow:visible!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.55!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+  vector-effect:non-scaling-stroke;
+  transition:
+    transform .44s cubic-bezier(.2,.95,.25,1),
+    opacity .26s ease!important;
+}
+.app-navigation .app-nav-item.active .ios-nav-icon{
+  opacity:.96!important;
+  transform:translateY(-.5px)!important;
+}
+.app-navigation .app-nav-item.active .ios-nav-icon svg{
+  stroke-width:1.55!important;
+  transform:scale(1.035)!important;
+}
+
+/* Selection lens: quieter, translucent, not a white blob. */
+.app-navigation .ios-nav-lens{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.72),rgba(255,255,255,.48))!important;
+  border:1px solid rgba(255,255,255,.76)!important;
+  box-shadow:
+    0 5px 16px rgba(25,35,55,.09),
+    inset 0 1px 0 rgba(255,255,255,.88)!important;
+}
+[data-theme="dark"] .app-navigation .ios-nav-lens{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.105),rgba(255,255,255,.052))!important;
+  border-color:rgba(255,255,255,.105)!important;
+  box-shadow:
+    0 7px 20px rgba(0,0,0,.20),
+    inset 0 1px 0 rgba(255,255,255,.07)!important;
+}
+
+/* Desktop: clean horizontal control. */
+@media(min-width:701px){
+  .app-navigation .app-nav-item{
+    gap:7px!important;
+    padding-inline:15px!important;
+  }
+}
+
+/* Mobile: actual compact tab-bar proportions, all five always visible. */
+@media(max-width:700px){
+  .app-navigation{
+    display:grid!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    width:calc(100% - 12px)!important;
+    gap:1px!important;
+    padding:4px!important;
+    overflow:hidden!important;
+    border-radius:22px!important;
+  }
+  .app-navigation .app-nav-item{
+    width:100%!important;
+    min-width:0!important;
+    min-height:50px!important;
+    padding:5px 1px!important;
+    gap:3px!important;
+    flex-direction:column!important;
+    font-size:9px!important;
+    font-weight:500!important;
+    letter-spacing:-.018em!important;
+  }
+  .app-navigation .app-nav-item.active{
+    font-weight:600!important;
+  }
+  .app-navigation .ios-nav-icon,
+  .app-navigation .ios-nav-icon svg{
+    width:18px!important;
+    height:18px!important;
+  }
+  .app-navigation .ios-nav-icon{
+    flex-basis:18px!important;
+  }
+  .app-navigation .ios-nav-label{
+    width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    text-align:center!important;
+    line-height:1.05!important;
+  }
+  .app-navigation .ios-nav-lens{
+    border-radius:16px!important;
+  }
+}
+
+@media(max-width:390px){
+  .app-navigation .app-nav-item{
+    font-size:8px!important;
+    min-height:48px!important;
+  }
+  .app-navigation .ios-nav-icon,
+  .app-navigation .ios-nav-icon svg{
+    width:17px!important;
+    height:17px!important;
+  }
+  .app-navigation .ios-nav-icon{
+    flex-basis:17px!important;
+  }
+}
+
+
+/* =========================================================
+   V25.8 — MULTI-INTENT AI ANSWERS
+========================================================= */
+.ai-answer p{
+  line-height:1.6!important;
+  letter-spacing:-.005em;
+}
+
+.ai-answer{
+  align-items:flex-start!important;
+}

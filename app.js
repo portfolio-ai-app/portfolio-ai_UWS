@@ -2766,10 +2766,261 @@ function answerMoneyQuestion(question) {
   return "You currently have " + plainMoney(capital) + ". Select the asset or portfolio you want to test and I will answer in exact USD amounts.";
 }
 
+
+function aiQuestionIntents(question) {
+  var q = String(question || "").toLowerCase();
+
+  return {
+    money: moneyQuestionKind(q),
+    profit:
+      q.indexOf("profit") >= 0 ||
+      q.indexOf("make money") >= 0 ||
+      q.indexOf("real money") >= 0 ||
+      q.indexOf("significant") >= 0,
+    trade:
+      q.indexOf("trade") >= 0 ||
+      q.indexOf("open") >= 0 ||
+      q.indexOf("enter") >= 0 ||
+      q.indexOf("position") >= 0 ||
+      q.indexOf("buy") >= 0 ||
+      q.indexOf("sell") >= 0,
+    together:
+      q.indexOf("all") >= 0 ||
+      q.indexOf("together") >= 0 ||
+      q.indexOf("selected assets") >= 0 ||
+      q.indexOf("selected positions") >= 0 ||
+      q.indexOf("basket") >= 0 ||
+      q.indexOf("multiple") >= 0,
+    risk:
+      q.indexOf("risk") >= 0 ||
+      q.indexOf("danger") >= 0 ||
+      q.indexOf("correlation") >= 0,
+    direction:
+      q.indexOf("direction") >= 0 ||
+      q.indexOf("bull") >= 0 ||
+      q.indexOf("bear") >= 0 ||
+      q.indexOf("lean") >= 0,
+    strongest:
+      q.indexOf("strong") >= 0 ||
+      q.indexOf("best") >= 0 ||
+      q.indexOf("focus") >= 0,
+    explain:
+      q.indexOf("why") >= 0 ||
+      q.indexOf("explain") >= 0
+  };
+}
+
+function aiIntentCount(intents) {
+  var count = 0;
+  var key;
+  for (key in intents) {
+    if (intents.hasOwnProperty(key) && intents[key]) count++;
+  }
+  return count;
+}
+
+function aiCapitalSentence(d) {
+  var capital = Number(d.capital || capitalNumber("investment", 0));
+  var minimum = Number(d.minimum || 0);
+  var comfortable = Number(d.comfortable || 0);
+  var add = Math.max(0, minimum - capital);
+
+  if (!capital || capital <= 0) {
+    return "Enter your portfolio amount first so I can judge whether the selected setup is practical.";
+  }
+
+  if (d.status === "INSUFFICIENT") {
+    return (
+      "Capital: your " +
+      plainMoney(capital) +
+      " is below Portfolio AI's practical range for this selection. You would need about " +
+      plainMoney(add) +
+      " more to reach roughly " +
+      plainMoney(minimum) +
+      "."
+    );
+  }
+
+  if (d.status === "LIMITED") {
+    return (
+      "Capital: your " +
+      plainMoney(capital) +
+      " is usable, but it is tight for this selection. Fewer simultaneous positions or more capital would give you more room."
+    );
+  }
+
+  if (minimum > 0 && capital < comfortable) {
+    return (
+      "Capital: your " +
+      plainMoney(capital) +
+      " is practical for this selection, although about " +
+      plainMoney(Math.max(0, comfortable - capital)) +
+      " more would give you additional breathing room."
+    );
+  }
+
+  return (
+    "Capital: your " +
+    plainMoney(capital) +
+    " is within Portfolio AI's practical range for the selected portfolio."
+  );
+}
+
+function aiTradeSentence(state, d) {
+  var availableCount = state && state.available ? state.available.length : 0;
+  var selectedCount = selectedAssets ? selectedAssets.length : 0;
+  var strongest = state && state.strongest ? state.strongest.asset.symbol : "";
+
+  if (!state || !availableCount) {
+    return "Trade setup: I need usable market data before I can judge the selected entries.";
+  }
+
+  if (d.status === "INSUFFICIENT") {
+    if (selectedCount > 1) {
+      return "Trade setup: not comfortably across all selected assets. The current capital would spread the portfolio too thin.";
+    }
+    return "Trade setup: the asset can be considered, but the current capital is constrained under the active risk settings.";
+  }
+
+  if (state.verdict === "WAIT") {
+    return "Trade setup: I would wait. The loaded market data does not show a strong enough edge yet.";
+  }
+
+  if (state.verdict === "HIGH RISK") {
+    return (
+      "Trade setup: I would not open every selected position together right now. Combined volatility or correlation risk is elevated" +
+      (strongest ? ", although " + strongest + " currently has the clearest individual setup." : ".")
+    );
+  }
+
+  if (state.verdict === "SELECTIVE") {
+    return (
+      "Trade setup: be selective rather than opening everything together" +
+      (strongest ? ". " + strongest + " currently has the clearest setup." : ".")
+    );
+  }
+
+  return (
+    "Trade setup: the signals are relatively aligned, so the selected trades are more workable as a portfolio" +
+    (strongest ? ". " + strongest + " currently has the strongest setup." : ".")
+  );
+}
+
+function aiProfitSentence(d) {
+  var capital = Number(d.capital || capitalNumber("investment", 0));
+
+  if (!capital || capital <= 0) {
+    return "Profit potential: enter your portfolio amount first so I can translate percentage moves into actual dollars.";
+  }
+
+  var gain5 = capital * 0.05;
+  var gain10 = capital * 0.10;
+  var gain20 = capital * 0.20;
+
+  return (
+    "Profit potential: with " +
+    plainMoney(capital) +
+    ", a 5% portfolio gain is about " +
+    plainMoney(gain5) +
+    ", 10% is about " +
+    plainMoney(gain10) +
+    ", and 20% is about " +
+    plainMoney(gain20) +
+    ". Larger dollar profits require either more capital or a larger market move, and neither is guaranteed."
+  );
+}
+
+function answerMultiIntentAIQuestion(question, intents) {
+  var state = buildAIState();
+  var d = capitalAdequacyData();
+  var parts = [];
+
+  if (!state) {
+    return "I need usable market data first. Select assets, refresh the prices and historical data, then ask again.";
+  }
+
+  if (intents.trade || intents.together) {
+    parts.push(aiTradeSentence(state, d));
+  }
+
+  if (intents.money) {
+    parts.push(aiCapitalSentence(d));
+  }
+
+  if (intents.profit) {
+    parts.push(aiProfitSentence(d));
+  }
+
+  if (intents.risk) {
+    var warning = aiWarningText(state);
+    parts.push(
+      "Risk: " +
+      warning.text +
+      " Portfolio risk is currently classified as " +
+      state.riskLevel.toLowerCase() +
+      "."
+    );
+  }
+
+  if (intents.direction) {
+    parts.push(
+      "Direction: " +
+      state.bias +
+      " — " +
+      state.bullish +
+      " bullish, " +
+      state.bearish +
+      " bearish and " +
+      state.neutral +
+      " neutral."
+    );
+  }
+
+  if (intents.strongest && state.strongest) {
+    parts.push(
+      "Strongest setup: " +
+      state.strongest.asset.symbol +
+      ", currently " +
+      state.strongest.signal.label.toLowerCase() +
+      " at " +
+      state.strongest.signal.confidence.toFixed(0) +
+      "% confidence."
+    );
+  }
+
+  if (intents.explain && !parts.length) {
+    parts.push(aiNarrative(state));
+  }
+
+  if (!parts.length) {
+    return answerAIQuestionGeneric(question);
+  }
+
+  if ((intents.trade || intents.together) && intents.money) {
+    parts.push(
+      "Broker note: actual minimum order sizes, fractional trading and margin requirements still depend on the broker and instrument."
+    );
+  }
+
+  return parts.join(" ");
+}
+
 function answerAIQuestion(question) {
-  if (moneyQuestionKind(question)) {
+  var intents = aiQuestionIntents(question);
+
+  /*
+    v25.8:
+    Do not force a mixed question into one keyword bucket.
+    Trade + capital + profit questions are answered together.
+  */
+  if (aiIntentCount(intents) > 1) {
+    return answerMultiIntentAIQuestion(question, intents);
+  }
+
+  if (intents.money) {
     return answerMoneyQuestion(question);
   }
+
   return answerAIQuestionGeneric(question);
 }
 
@@ -6369,11 +6620,11 @@ function ensurePrimaryNavigationStructure() {
   if (!nav) return;
 
   var expected = [
-    ["overview","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\">  <path d=\"M3.8 10.7 12 3.9l8.2 6.8\"/>  <path d=\"M6.2 9.2v9.2c0 .9.7 1.6 1.6 1.6h8.4c.9 0 1.6-.7 1.6-1.6V9.2\"/>  <path d=\"M9.5 20v-5.7c0-.7.6-1.3 1.3-1.3h2.4c.7 0 1.3.6 1.3 1.3V20\"/></svg>","Overview"],
-    ["portfolio","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\">  <rect x=\"3.2\" y=\"6.7\" width=\"17.6\" height=\"12.2\" rx=\"3.4\"/>  <path d=\"M8.1 6.7V5.4c0-1.1.9-2 2-2h3.8c1.1 0 2 .9 2 2v1.3\"/>  <path d=\"M3.2 11.2c2.8 1.1 5.7 1.6 8.8 1.6s6-.5 8.8-1.6\"/>  <rect x=\"10.2\" y=\"11.7\" width=\"3.6\" height=\"2.2\" rx=\"1.1\"/></svg>","Portfolio"],
-    ["intelligence","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\">  <path d=\"M12 2.9c.7 3.7 2.5 5.5 6.1 6.1-3.6.7-5.4 2.5-6.1 6.1-.7-3.6-2.5-5.4-6.1-6.1 3.6-.6 5.4-2.4 6.1-6.1Z\"/>  <path d=\"M18.3 14.9c.3 1.7 1.2 2.6 2.9 2.9-1.7.3-2.6 1.2-2.9 2.9-.3-1.7-1.2-2.6-2.9-2.9 1.7-.3 2.6-1.2 2.9-2.9Z\"/></svg>","Intelligence"],
-    ["trade","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\">  <path d=\"M4.2 17.8 9.2 12.8l3.6 3.6 7-7\"/>  <path d=\"M14.7 9.4h5.1v5.1\"/>  <path d=\"M4.2 20.3h15.6\"/></svg>","Trade"],
-    ["news","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\">  <rect x=\"3.3\" y=\"4\" width=\"17.4\" height=\"16\" rx=\"3.2\"/>  <rect x=\"6.6\" y=\"7.2\" width=\"4.2\" height=\"4.2\" rx=\"1\"/>  <path d=\"M13.5 7.5h3.9\"/>  <path d=\"M13.5 10.6h3.9\"/>  <path d=\"M6.6 14.6h10.8\"/>  <path d=\"M6.6 17.3h7.2\"/></svg>","News"]
+    ["overview","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5.2 10.2 12 4.7l6.8 5.5v7.4a1.55 1.55 0 0 1-1.55 1.55H6.75A1.55 1.55 0 0 1 5.2 17.6Z\"/><path d=\"M9.5 19.15v-5.1h5v5.1\"/></svg>","Overview"],
+    ["portfolio","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"4.15\" y=\"6.75\" width=\"15.7\" height=\"12\" rx=\"3.15\"/><path d=\"M8.45 6.75V5.8c0-.95.75-1.7 1.7-1.7h3.7c.95 0 1.7.75 1.7 1.7v.95\"/><path d=\"M4.35 11.15c4.85 1.55 10.45 1.55 15.3 0\"/></svg>","Portfolio"],
+    ["intelligence","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M11.55 4.15c.65 3.6 2.5 5.45 6.1 6.1-3.6.65-5.45 2.5-6.1 6.1-.65-3.6-2.5-5.45-6.1-6.1 3.6-.65 5.45-2.5 6.1-6.1Z\"/><path d=\"M18.15 15.75c.25 1.35.95 2.05 2.3 2.3-1.35.25-2.05.95-2.3 2.3-.25-1.35-.95-2.05-2.3-2.3 1.35-.25 2.05-.95 2.3-2.3Z\"/></svg>","Intelligence"],
+    ["trade","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"m5 17 4.7-4.7 3.15 3.15L19 9.3\"/><path d=\"M14.75 9.3H19v4.25\"/></svg>","Trade"],
+    ["news","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"4.1\" y=\"4.35\" width=\"15.8\" height=\"15.3\" rx=\"3\"/><path d=\"M7.35 8h4.15v4.15H7.35Z\"/><path d=\"M14.2 8.2h2.45M14.2 11h2.45M7.35 15h9.3M7.35 17.5h6.1\"/></svg>","News"]
   ];
 
   var existing = nav.querySelectorAll("[data-app-view]");
