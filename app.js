@@ -2780,13 +2780,35 @@ function aiQuestionIntents(question) {
     q.indexOf("horizon") >= 0 ||
     q.indexOf("invest") >= 0;
 
+  var assetChoice =
+    q.indexOf("which asset") >= 0 ||
+    q.indexOf("what asset") >= 0 ||
+    q.indexOf("which one") >= 0 ||
+    q.indexOf("what can i buy") >= 0 ||
+    q.indexOf("what should i buy") >= 0 ||
+    q.indexOf("what should i choose") >= 0 ||
+    q.indexOf("which should i choose") >= 0 ||
+    q.indexOf("opt for") >= 0 ||
+    q.indexOf("best for my capital") >= 0 ||
+    q.indexOf("suitable for my capital") >= 0 ||
+    q.indexOf("afford with my capital") >= 0 ||
+    q.indexOf("fit my capital") >= 0;
+
+  var money =
+    moneyQuestionKind(q) ||
+    q.indexOf("my capital") >= 0 ||
+    q.indexOf("portfolio value") >= 0 ||
+    q.indexOf("budget") >= 0;
+
   return {
-    money: moneyQuestionKind(q),
+    assetChoice: assetChoice,
+    money: money,
     profit:
       q.indexOf("profit") >= 0 ||
       q.indexOf("make money") >= 0 ||
       q.indexOf("real money") >= 0 ||
-      q.indexOf("significant") >= 0,
+      q.indexOf("significant") >= 0 ||
+      q.indexOf("return") >= 0,
     trade:
       !longTerm && (
         q.indexOf("trade") >= 0 ||
@@ -2809,19 +2831,22 @@ function aiQuestionIntents(question) {
     risk:
       q.indexOf("risk") >= 0 ||
       q.indexOf("danger") >= 0 ||
-      q.indexOf("correlation") >= 0,
+      q.indexOf("correlation") >= 0 ||
+      q.indexOf("safe") >= 0,
     direction:
       q.indexOf("direction") >= 0 ||
       q.indexOf("bull") >= 0 ||
       q.indexOf("bear") >= 0 ||
-      q.indexOf("lean") >= 0,
+      q.indexOf("lean") >= 0 ||
+      q.indexOf("trend") >= 0,
     strongest:
       q.indexOf("strong") >= 0 ||
-      q.indexOf("best") >= 0 ||
+      q.indexOf("best setup") >= 0 ||
       q.indexOf("focus") >= 0,
     explain:
       q.indexOf("why") >= 0 ||
-      q.indexOf("explain") >= 0
+      q.indexOf("explain") >= 0 ||
+      q.indexOf("reason") >= 0
   };
 }
 
@@ -3007,6 +3032,187 @@ function longTermMarketMixText() {
   return names.join(", ");
 }
 
+
+function singleAssetCapitalMinimum(asset) {
+  var riskPct = capitalNumber("riskPerTrade", 1);
+  var stopPct = capitalNumber("stopDistance", 2);
+  var market = capitalAssetMarket(asset);
+
+  var weights = {
+    "Stocks": 1.00,
+    "ETF": 0.85,
+    "Forex": 1.15,
+    "Crypto": 0.65,
+    "Commodities": 1.20
+  };
+
+  var riskAdjustment = riskPct > 0 ? premiumClamp(1 / riskPct, 0.65, 2.0) : 2;
+  var stopAdjustment = stopPct > 0 ? premiumClamp(2 / stopPct, 0.70, 1.65) : 1.65;
+  var marketAdjustment = weights[market] || 1;
+
+  var minimum = 500 * marketAdjustment * riskAdjustment * stopAdjustment;
+  return Math.ceil(minimum / 100) * 100;
+}
+
+function assetAccessNote(item, capital) {
+  var market = capitalAssetMarket(item.asset);
+  var price = Number(item.analysis.latestPrice || 0);
+
+  if (market === "Stocks" || market === "ETF") {
+    if (price > 0 && capital >= price) {
+      return "Your capital is enough for at least one whole share at the latest loaded price, before fees.";
+    }
+    if (price > 0) {
+      return "A whole share costs more than your current capital at the latest loaded price, so access would require fractional shares if your broker supports them.";
+    }
+    return "Actual access depends on the broker's whole-share or fractional-share rules.";
+  }
+
+  if (market === "Crypto") {
+    return "Crypto is normally divisible into fractional units, although the exchange or broker may impose a minimum order.";
+  }
+
+  if (market === "Forex") {
+    return "Forex access depends on minimum lot size, margin and leverage at your broker; I will not assume that $250 automatically supports a standard lot.";
+  }
+
+  if (market === "Commodities") {
+    return "Commodity access is usually broker/contract specific, so exact minimum size and margin must be checked with the broker.";
+  }
+
+  return "Actual minimum order size depends on the broker.";
+}
+
+function assetChoiceScore(item, capital) {
+  var minimum = singleAssetCapitalMinimum(item.asset);
+  var capitalRatio = minimum > 0 ? capital / minimum : 0;
+
+  var signal = item.signal || {};
+  var confidence = Number(signal.confidence || 0);
+  var directional = Number(signal.score || 0);
+  var vol = Number(item.analysis.recentVolatility || 0);
+
+  var signalQuality = 0;
+  if (signal.label === "Bullish") {
+    signalQuality = 22 + Math.min(20, Math.max(0, directional) * 0.20);
+  } else if (signal.label === "Neutral") {
+    signalQuality = 8;
+  } else {
+    signalQuality = -12;
+  }
+
+  var capitalFit = premiumClamp(capitalRatio, 0, 1.35) * 42;
+  var confidenceFit = premiumClamp(confidence / 100, 0, 1) * 28;
+  var volatilityPenalty = premiumClamp((vol - 0.22) * 28, 0, 18);
+
+  return {
+    item: item,
+    minimum: minimum,
+    capitalRatio: capitalRatio,
+    score: capitalFit + confidenceFit + signalQuality - volatilityPenalty
+  };
+}
+
+function answerAssetChoiceQuestion(question) {
+  var state = buildAIState();
+  var capital = capitalNumber("investment", 0);
+
+  if (!capital || capital <= 0) {
+    return "Enter your portfolio amount first. Then I can compare the selected assets against your actual capital.";
+  }
+
+  if (!state || !state.available || !state.available.length) {
+    return "I need usable market data for the selected assets before I can compare them. Refresh the market data and ask again.";
+  }
+
+  var ranked = state.available.map(function(item){
+    return assetChoiceScore(item, capital);
+  }).sort(function(a,b){
+    return b.score - a.score;
+  });
+
+  var practical = ranked.filter(function(row){
+    return row.capitalRatio >= 1;
+  });
+
+  var usable = ranked.filter(function(row){
+    return row.capitalRatio >= 0.65;
+  });
+
+  var pick = practical.length ? practical[0] : (usable.length ? usable[0] : ranked[0]);
+  var item = pick.item;
+  var symbol = item.asset.symbol;
+  var market = capitalAssetMarket(item.asset);
+  var signal = item.signal.label;
+  var confidence = Number(item.signal.confidence || 0);
+  var minimum = pick.minimum;
+  var extra = Math.max(0, minimum - capital);
+
+  var headline;
+  if (pick.capitalRatio >= 1 && signal !== "Bearish") {
+    headline = "Best fit for your " + plainMoney(capital) + " among the selected assets: " + symbol + ".";
+  } else if (pick.capitalRatio >= 0.65 && signal !== "Bearish") {
+    headline = symbol + " is the closest fit for your " + plainMoney(capital) + ", but the capital is still tight.";
+  } else {
+    headline = "None of the selected assets is a strong practical fit for " + plainMoney(capital) + " under the current Portfolio AI risk settings.";
+  }
+
+  var reason =
+    symbol +
+    " is currently " +
+    signal.toLowerCase() +
+    " at " +
+    confidence.toFixed(0) +
+    "% confidence, and Portfolio AI's single-asset practical-capital estimate for this " +
+    market.toLowerCase() +
+    " instrument is about " +
+    plainMoney(minimum) +
+    ".";
+
+  var capitalText;
+  if (pick.capitalRatio >= 1) {
+    capitalText = "Your current capital clears that Portfolio AI practicality estimate.";
+  } else {
+    capitalText =
+      "You are about " +
+      plainMoney(extra) +
+      " below that practicality estimate. That does not necessarily mean the broker will block the trade; it means the position would be constrained under the dashboard's current risk assumptions.";
+  }
+
+  var runner = "";
+  if (ranked.length > 1) {
+    var second = ranked[1];
+    runner =
+      " Next closest: " +
+      second.item.asset.symbol +
+      " (" +
+      second.item.signal.label +
+      ", " +
+      Number(second.item.signal.confidence || 0).toFixed(0) +
+      "% confidence).";
+  }
+
+  var warning = "";
+  if (signal === "Bearish") {
+    warning = " I would not choose it just because it fits the capital; the current signal is bearish.";
+  } else if (signal === "Neutral") {
+    warning = " The signal is neutral, so capital fit alone is not a reason to enter immediately.";
+  }
+
+  return (
+    headline +
+    " " +
+    reason +
+    " " +
+    capitalText +
+    " " +
+    assetAccessNote(item, capital) +
+    warning +
+    runner +
+    " This is a ranking of the assets you selected using current dashboard data, not a guarantee of profit."
+  );
+}
+
 function answerLongTermQuestion(question) {
   var state = buildAIState();
   var d = capitalAdequacyData();
@@ -3099,7 +3305,16 @@ function answerMultiIntentAIQuestion(question, intents) {
     return "I need usable market data first. Select assets, refresh the prices and historical data, then ask again.";
   }
 
-  if (intents.longTerm) {
+  /*
+    Asset-choice questions are answered first because phrases such as
+    "which asset can I opt for with my capital?" are recommendations,
+    not requests to add capital to the entire portfolio.
+  */
+  if (intents.assetChoice) {
+    parts.push(answerAssetChoiceQuestion(question));
+  }
+
+  if (intents.longTerm && !intents.assetChoice) {
     parts.push(answerLongTermQuestion(question));
   }
 
@@ -3107,7 +3322,7 @@ function answerMultiIntentAIQuestion(question, intents) {
     parts.push(aiTradeSentence(state, d));
   }
 
-  if (intents.money) {
+  if (intents.money && !intents.assetChoice) {
     parts.push(aiCapitalSentence(d));
   }
 
@@ -3173,10 +3388,22 @@ function answerAIQuestion(question) {
   var intents = aiQuestionIntents(question);
 
   /*
-    v25.9:
-    Long-horizon / holding questions are not short-term trade questions.
-    Mixed questions still combine relevant intents.
+    v26:
+    Route by meaning, not by whichever keyword is found first.
+    Asset recommendation has priority over generic money advice.
   */
+  if (intents.assetChoice) {
+    if (
+      intents.profit ||
+      intents.risk ||
+      intents.direction ||
+      intents.longTerm
+    ) {
+      return answerMultiIntentAIQuestion(question, intents);
+    }
+    return answerAssetChoiceQuestion(question);
+  }
+
   if (aiIntentCount(intents) > 1) {
     return answerMultiIntentAIQuestion(question, intents);
   }
