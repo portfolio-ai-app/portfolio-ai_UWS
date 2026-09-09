@@ -9,6 +9,7 @@
   <title>Portfolio AI — Market Intelligence</title>
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+  <script type="module" src="https://www.tradingview-widget.com/w/en/tv-ticker-tape.js"></script>
   <script src="app.js" defer></script>
 </head>
 <body>
@@ -31,28 +32,41 @@
 </div>
 </nav>
 
-<div class="market-ticker-shell" aria-label="Live market prices">
-  <div class="market-ticker-label">
-    <span class="ticker-live-dot"></span>
-    <strong>Markets</strong>
-  </div>
 
-  <div class="market-ticker-window">
-    <div id="marketTickerTrack" class="market-ticker-track">
-      <div class="market-ticker-loading">
-        Loading latest prices…
+<section class="market-pulse-shell" aria-label="Global market prices">
+  <div class="market-pulse-head">
+    <div class="market-pulse-title">
+      <span class="market-pulse-live-dot"></span>
+      <div>
+        <strong>Global Market Pulse</strong>
+        <small>Live market context</small>
       </div>
+    </div>
+
+    <div class="market-pulse-meta">
+      <span class="market-pulse-chip">Indices</span>
+      <span class="market-pulse-chip">Equities</span>
+      <span class="market-pulse-chip">FX</span>
+      <span class="market-pulse-chip">Crypto</span>
+      <span class="market-pulse-chip">Metals</span>
+      <span class="market-pulse-source">TradingView</span>
     </div>
   </div>
 
-  <button
-    id="marketTickerRefresh"
-    class="market-ticker-refresh"
-    type="button"
-    title="Refresh market strip"
-    aria-label="Refresh market strip"
-  >↻</button>
-</div>
+  <div class="market-pulse-tape">
+    <div class="market-pulse-edge market-pulse-edge-left" aria-hidden="true"></div>
+
+    <tv-ticker-tape
+      id="portfolioTradingViewTicker"
+      symbols="SP:SPX,NASDAQ:IXIC,NASDAQ:AAPL,BITSTAMP:BTCUSD,FX:EURUSD,OANDA:XAUUSD,FX:USDZAR"
+      item-size="compact"
+      theme="light"
+      locale="en"
+    ></tv-ticker-tape>
+
+    <div class="market-pulse-edge market-pulse-edge-right" aria-hidden="true"></div>
+  </div>
+</section>
 
 <nav class="app-navigation" aria-label="Primary">
   <button type="button" class="app-nav-item active" data-app-view="overview">

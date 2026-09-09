@@ -3523,3 +3523,223 @@ footer{color:var(--apple-secondary)}
     -webkit-mask-image:none;
   }
 }
+
+
+/* =========================================================
+   V21 — PREMIUM TRADINGVIEW MARKET PULSE
+========================================================= */
+
+.market-ticker-shell{
+  display:none!important;
+}
+
+.market-pulse-shell{
+  position:sticky;
+  top:58px;
+  z-index:118;
+  width:100%;
+  border-top:1px solid var(--apple-hairline);
+  border-bottom:1px solid var(--apple-hairline);
+  background:
+    linear-gradient(
+      180deg,
+      color-mix(in srgb,var(--apple-card-solid) 96%,transparent),
+      color-mix(in srgb,var(--apple-card-solid) 88%,transparent)
+    );
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.055),
+    inset 0 1px 0 rgba(255,255,255,.35);
+  backdrop-filter:saturate(180%) blur(24px);
+  -webkit-backdrop-filter:saturate(180%) blur(24px);
+}
+
+.market-pulse-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  min-height:34px;
+  padding:6px 18px 5px;
+  border-bottom:1px solid var(--apple-hairline);
+}
+
+.market-pulse-title{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex:0 0 auto;
+}
+
+.market-pulse-title > div{
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+}
+
+.market-pulse-title strong{
+  color:var(--apple-text);
+  font-size:10px;
+  font-weight:760;
+  letter-spacing:.015em;
+}
+
+.market-pulse-title small{
+  color:var(--apple-secondary);
+  font-size:9px;
+}
+
+.market-pulse-live-dot{
+  width:7px;
+  height:7px;
+  border-radius:50%;
+  background:#30d158;
+  box-shadow:
+    0 0 0 4px rgba(48,209,88,.10),
+    0 0 14px rgba(48,209,88,.25);
+}
+
+.market-pulse-meta{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap:6px;
+  min-width:0;
+}
+
+.market-pulse-chip{
+  padding:4px 8px;
+  border:1px solid var(--apple-hairline);
+  border-radius:999px;
+  background:rgba(127,127,127,.055);
+  color:var(--apple-secondary);
+  font-size:8px;
+  font-weight:650;
+  letter-spacing:.02em;
+}
+
+.market-pulse-source{
+  margin-left:4px;
+  color:var(--apple-secondary);
+  font-size:8px;
+  font-weight:600;
+  opacity:.72;
+}
+
+.market-pulse-tape{
+  position:relative;
+  min-height:54px;
+  overflow:hidden;
+  background:
+    radial-gradient(
+      circle at 50% -60%,
+      rgba(0,113,227,.08),
+      transparent 58%
+    );
+}
+
+.market-pulse-tape tv-ticker-tape{
+  display:block;
+  width:100%;
+  min-height:54px;
+}
+
+.market-pulse-edge{
+  position:absolute;
+  top:0;
+  bottom:0;
+  z-index:2;
+  width:26px;
+  pointer-events:none;
+}
+
+.market-pulse-edge-left{
+  left:0;
+  background:linear-gradient(
+    90deg,
+    var(--apple-card-solid),
+    transparent
+  );
+}
+
+.market-pulse-edge-right{
+  right:0;
+  background:linear-gradient(
+    270deg,
+    var(--apple-card-solid),
+    transparent
+  );
+}
+
+/* Navigation clears the larger market-pulse strip. */
+.app-navigation{
+  top:148px;
+}
+
+.portfolio-freeze-shell.is-frozen{
+  top:206px;
+}
+
+[data-theme="dark"] .market-pulse-shell{
+  box-shadow:
+    0 12px 36px rgba(0,0,0,.22),
+    inset 0 1px 0 rgba(255,255,255,.03);
+}
+
+[data-theme="dark"] .market-pulse-tape{
+  background:
+    radial-gradient(
+      circle at 50% -80%,
+      rgba(10,132,255,.11),
+      transparent 60%
+    );
+}
+
+@media(max-width:900px){
+  .market-pulse-meta{
+    overflow:hidden;
+  }
+
+  .market-pulse-chip:nth-of-type(n+4){
+    display:none;
+  }
+}
+
+@media(max-width:700px){
+  .market-pulse-shell{
+    top:60px;
+  }
+
+  .market-pulse-head{
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  .market-pulse-title > div{
+    display:block;
+  }
+
+  .market-pulse-title small{
+    display:none;
+  }
+
+  .market-pulse-chip{
+    display:none;
+  }
+
+  .market-pulse-source{
+    margin-left:0;
+  }
+
+  .market-pulse-tape,
+  .market-pulse-tape tv-ticker-tape{
+    min-height:50px;
+  }
+
+  .app-navigation{
+    top:144px;
+  }
+
+  .portfolio-freeze-shell.is-frozen{
+    top:198px;
+  }
+}
