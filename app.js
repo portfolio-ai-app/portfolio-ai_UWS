@@ -5501,24 +5501,52 @@
           title: "Nasdaq 100"
         },
         {
+          proName: "DJ:DJI",
+          title: "Dow Jones"
+        },
+        {
           proName: "NASDAQ:AAPL",
           title: "Apple"
+        },
+        {
+          proName: "NASDAQ:NVDA",
+          title: "NVIDIA"
+        },
+        {
+          proName: "NASDAQ:MSFT",
+          title: "Microsoft"
+        },
+        {
+          proName: "NASDAQ:TSLA",
+          title: "Tesla"
         },
         {
           proName: "BITSTAMP:BTCUSD",
           title: "Bitcoin"
         },
         {
+          proName: "BITSTAMP:ETHUSD",
+          title: "Ethereum"
+        },
+        {
           proName: "FX_IDC:EURUSD",
           title: "EUR / USD"
+        },
+        {
+          proName: "FX_IDC:GBPUSD",
+          title: "GBP / USD"
+        },
+        {
+          proName: "FX_IDC:USDZAR",
+          title: "USD / ZAR"
         },
         {
           proName: "OANDA:XAUUSD",
           title: "Gold"
         },
         {
-          proName: "FX_IDC:USDZAR",
-          title: "USD / ZAR"
+          proName: "OANDA:XAGUSD",
+          title: "Silver"
         }
       ],
       showSymbolLogo: true,

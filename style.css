@@ -3976,3 +3976,95 @@ footer{color:var(--apple-secondary)}
     top:194px!important;
   }
 }
+
+
+/* =========================================================
+   V21.4 — COMPACT MARKET TAPE
+   Fixes the oversized v21.3 iframe while preserving enough
+   vertical room for TradingView's price/change presentation.
+========================================================= */
+
+.market-pulse-head{
+  min-height:28px!important;
+  padding:3px 14px!important;
+}
+
+.market-pulse-title{
+  gap:8px!important;
+}
+
+.market-pulse-title strong{
+  font-size:9px!important;
+}
+
+.market-pulse-title small{
+  font-size:8px!important;
+}
+
+.market-pulse-chip{
+  padding:3px 7px!important;
+  font-size:7px!important;
+}
+
+.market-pulse-tape{
+  height:48px!important;
+  min-height:48px!important;
+  max-height:48px!important;
+  overflow:hidden!important;
+}
+
+.market-pulse-widget,
+.market-pulse-widget .tradingview-widget-container__widget{
+  width:100%!important;
+  height:48px!important;
+  min-height:48px!important;
+  max-height:48px!important;
+  overflow:hidden!important;
+}
+
+.market-pulse-widget iframe{
+  display:block!important;
+  width:100%!important;
+  height:48px!important;
+  min-height:48px!important;
+  max-height:48px!important;
+  border:0!important;
+  overflow:hidden!important;
+}
+
+.market-pulse-shell{
+  overflow:hidden!important;
+}
+
+/* Header ~28px + tape 48px. */
+.app-navigation{
+  top:136px!important;
+}
+
+.portfolio-freeze-shell.is-frozen{
+  top:194px!important;
+}
+
+@media(max-width:700px){
+  .market-pulse-head{
+    min-height:27px!important;
+    padding:3px 10px!important;
+  }
+
+  .market-pulse-tape,
+  .market-pulse-widget,
+  .market-pulse-widget .tradingview-widget-container__widget,
+  .market-pulse-widget iframe{
+    height:48px!important;
+    min-height:48px!important;
+    max-height:48px!important;
+  }
+
+  .app-navigation{
+    top:135px!important;
+  }
+
+  .portfolio-freeze-shell.is-frozen{
+    top:189px!important;
+  }
+}
