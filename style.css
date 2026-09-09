@@ -5115,3 +5115,165 @@ body:before{
     flex-basis:16px!important;
   }
 }
+
+
+/* =========================================================
+   V25.6 — FINAL MOBILE TAB BAR + ADVANCED iOS SYMBOL STYLE
+========================================================= */
+
+/* More polished SF-Symbol-inspired rendering */
+.app-navigation .ios-nav-icon{
+  position:relative;
+  width:19px!important;
+  height:19px!important;
+  flex:0 0 19px!important;
+  display:grid!important;
+  place-items:center!important;
+  opacity:.68!important;
+  border-radius:7px;
+  transition:
+    opacity .28s ease,
+    transform .42s cubic-bezier(.2,1.15,.25,1),
+    background .32s ease,
+    box-shadow .32s ease!important;
+}
+
+.app-navigation .ios-nav-icon svg{
+  width:19px!important;
+  height:19px!important;
+  fill:none!important;
+  stroke:currentColor!important;
+  stroke-width:1.65!important;
+  stroke-linecap:round!important;
+  stroke-linejoin:round!important;
+  vector-effect:non-scaling-stroke;
+  transition:
+    transform .42s cubic-bezier(.2,1.15,.25,1),
+    stroke-width .28s ease!important;
+}
+
+.app-navigation .app-nav-item.active .ios-nav-icon{
+  opacity:1!important;
+  transform:translateY(-1px) scale(1.04)!important;
+}
+
+.app-navigation .app-nav-item.active .ios-nav-icon svg{
+  stroke-width:1.95!important;
+  transform:scale(1.03)!important;
+}
+
+/* Subtle iOS glow behind the active symbol, not a legacy boxed icon */
+.app-navigation .app-nav-item.active .ios-nav-icon:before{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  z-index:-1;
+  border-radius:12px;
+  background:radial-gradient(circle,rgba(0,122,255,.16),rgba(0,122,255,.03) 56%,transparent 72%);
+  filter:blur(1px);
+  animation:iosSymbolGlow .42s cubic-bezier(.2,1.15,.25,1) both;
+}
+
+[data-theme="dark"] .app-navigation .app-nav-item.active .ios-nav-icon:before{
+  background:radial-gradient(circle,rgba(10,132,255,.27),rgba(10,132,255,.05) 56%,transparent 72%);
+}
+
+@keyframes iosSymbolGlow{
+  from{opacity:0;transform:scale(.72)}
+  to{opacity:1;transform:scale(1)}
+}
+
+/* MOBILE: all 5 tabs must fit. No horizontal scrolling, no hidden News. */
+@media(max-width:700px){
+  .app-navigation{
+    display:grid!important;
+    grid-template-columns:repeat(5,minmax(0,1fr))!important;
+    align-items:stretch!important;
+    gap:2px!important;
+    width:calc(100% - 12px)!important;
+    max-width:none!important;
+    margin:8px auto 14px!important;
+    padding:4px!important;
+    overflow:hidden!important;
+    white-space:normal!important;
+    scroll-snap-type:none!important;
+    border-radius:23px!important;
+  }
+
+  .app-navigation .app-nav-item{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:3px!important;
+    width:100%!important;
+    min-width:0!important;
+    max-width:none!important;
+    min-height:52px!important;
+    padding:5px 2px!important;
+    border-radius:17px!important;
+    overflow:visible!important;
+  }
+
+  .app-navigation .ios-nav-icon{
+    width:18px!important;
+    height:18px!important;
+    flex-basis:18px!important;
+  }
+
+  .app-navigation .ios-nav-icon svg{
+    width:18px!important;
+    height:18px!important;
+  }
+
+  .app-navigation .ios-nav-label{
+    display:block!important;
+    width:100%!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+    text-align:center!important;
+    font-size:8px!important;
+    line-height:1.1!important;
+    letter-spacing:-.01em!important;
+  }
+
+  .app-navigation .app-nav-item.active:after{
+    left:31%!important;
+    right:31%!important;
+    bottom:3px!important;
+    height:2px!important;
+  }
+
+  .app-navigation .ios-nav-lens{
+    border-radius:17px!important;
+  }
+}
+
+/* Tiny phones: still show all five, icon first and labels compressed safely. */
+@media(max-width:390px){
+  .app-navigation{
+    width:calc(100% - 8px)!important;
+    gap:1px!important;
+    padding:3px!important;
+  }
+
+  .app-navigation .app-nav-item{
+    min-height:49px!important;
+    padding:4px 1px!important;
+  }
+
+  .app-navigation .ios-nav-icon,
+  .app-navigation .ios-nav-icon svg{
+    width:17px!important;
+    height:17px!important;
+  }
+
+  .app-navigation .ios-nav-icon{
+    flex-basis:17px!important;
+  }
+
+  .app-navigation .ios-nav-label{
+    font-size:7px!important;
+  }
+}

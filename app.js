@@ -6369,11 +6369,11 @@ function ensurePrimaryNavigationStructure() {
   if (!nav) return;
 
   var expected = [
-    ["overview","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4.5 10.5 12 4l7.5 6.5\"/><path d=\"M6.5 9.5v9.5h11V9.5\"/><path d=\"M9.5 19v-5.5h5V19\"/></svg>","Overview"],
-    ["portfolio","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"3.5\" y=\"6.5\" width=\"17\" height=\"12.5\" rx=\"3\"/><path d=\"M8 6.5V5.3A2.3 2.3 0 0 1 10.3 3h3.4A2.3 2.3 0 0 1 16 5.3v1.2\"/><path d=\"M3.5 11.5h17\"/><path d=\"M10 11.5v1.7h4v-1.7\"/></svg>","Portfolio"],
-    ["intelligence","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 3.2 13.8 8l4.8 1.8-4.8 1.8-1.8 4.8-1.8-4.8-4.8-1.8L10.2 8 12 3.2Z\"/><path d=\"m18.3 14.8.8 2.1 2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8.8-2.1Z\"/></svg>","Intelligence"],
-    ["trade","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 17 10 12l3.2 3.2L20 8.4\"/><path d=\"M14.8 8.4H20v5.2\"/></svg>","Trade"],
-    ["news","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"3\"/><path d=\"M8 8h8\"/><path d=\"M8 12h3\"/><path d=\"M14 12h2\"/><path d=\"M8 16h8\"/></svg>","News"]
+    ["overview","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\">  <path d=\"M3.8 10.7 12 3.9l8.2 6.8\"/>  <path d=\"M6.2 9.2v9.2c0 .9.7 1.6 1.6 1.6h8.4c.9 0 1.6-.7 1.6-1.6V9.2\"/>  <path d=\"M9.5 20v-5.7c0-.7.6-1.3 1.3-1.3h2.4c.7 0 1.3.6 1.3 1.3V20\"/></svg>","Overview"],
+    ["portfolio","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\">  <rect x=\"3.2\" y=\"6.7\" width=\"17.6\" height=\"12.2\" rx=\"3.4\"/>  <path d=\"M8.1 6.7V5.4c0-1.1.9-2 2-2h3.8c1.1 0 2 .9 2 2v1.3\"/>  <path d=\"M3.2 11.2c2.8 1.1 5.7 1.6 8.8 1.6s6-.5 8.8-1.6\"/>  <rect x=\"10.2\" y=\"11.7\" width=\"3.6\" height=\"2.2\" rx=\"1.1\"/></svg>","Portfolio"],
+    ["intelligence","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\">  <path d=\"M12 2.9c.7 3.7 2.5 5.5 6.1 6.1-3.6.7-5.4 2.5-6.1 6.1-.7-3.6-2.5-5.4-6.1-6.1 3.6-.6 5.4-2.4 6.1-6.1Z\"/>  <path d=\"M18.3 14.9c.3 1.7 1.2 2.6 2.9 2.9-1.7.3-2.6 1.2-2.9 2.9-.3-1.7-1.2-2.6-2.9-2.9 1.7-.3 2.6-1.2 2.9-2.9Z\"/></svg>","Intelligence"],
+    ["trade","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\">  <path d=\"M4.2 17.8 9.2 12.8l3.6 3.6 7-7\"/>  <path d=\"M14.7 9.4h5.1v5.1\"/>  <path d=\"M4.2 20.3h15.6\"/></svg>","Trade"],
+    ["news","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\">  <rect x=\"3.3\" y=\"4\" width=\"17.4\" height=\"16\" rx=\"3.2\"/>  <rect x=\"6.6\" y=\"7.2\" width=\"4.2\" height=\"4.2\" rx=\"1\"/>  <path d=\"M13.5 7.5h3.9\"/>  <path d=\"M13.5 10.6h3.9\"/>  <path d=\"M6.6 14.6h10.8\"/>  <path d=\"M6.6 17.3h7.2\"/></svg>","News"]
   ];
 
   var existing = nav.querySelectorAll("[data-app-view]");
@@ -7117,22 +7117,8 @@ window.setTimeout(refreshIOSNavLens, 250);
 
 
 function ensureActiveNavVisible() {
-  var nav = document.querySelector(".app-navigation");
-  if (!nav) return;
-  if (window.innerWidth > 700) return;
-
-  var active = nav.querySelector("[data-app-view].active");
-  if (!active) return;
-
-  try {
-    active.scrollIntoView({
-      behavior: "smooth",
-      inline: "center",
-      block: "nearest"
-    });
-  } catch (e) {
-    nav.scrollLeft = Math.max(0, active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2);
-  }
+  /* v25.6 mobile nav fits all five tabs, so no horizontal auto-scroll is needed. */
+  return;
 }
 
 document.addEventListener("click", function(event) {
