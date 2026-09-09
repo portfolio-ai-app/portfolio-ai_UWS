@@ -5459,3 +5459,15 @@ body:before{
 .ai-answer{
   align-items:flex-start!important;
 }
+
+
+/* =========================================================
+   V25.9 — LONG-HORIZON AI ANSWERS
+========================================================= */
+@media(max-width:700px){
+  #aiAnswer,
+  .ai-answer{
+    font-size:13px!important;
+    line-height:1.58!important;
+  }
+}

@@ -2770,6 +2770,16 @@ function answerMoneyQuestion(question) {
 function aiQuestionIntents(question) {
   var q = String(question || "").toLowerCase();
 
+  var longTerm =
+    q.indexOf("hold") >= 0 ||
+    q.indexOf("long term") >= 0 ||
+    q.indexOf("long-term") >= 0 ||
+    q.indexOf("realistic") >= 0 ||
+    q.indexOf("year") >= 0 ||
+    q.indexOf("month") >= 0 ||
+    q.indexOf("horizon") >= 0 ||
+    q.indexOf("invest") >= 0;
+
   return {
     money: moneyQuestionKind(q),
     profit:
@@ -2778,19 +2788,24 @@ function aiQuestionIntents(question) {
       q.indexOf("real money") >= 0 ||
       q.indexOf("significant") >= 0,
     trade:
-      q.indexOf("trade") >= 0 ||
-      q.indexOf("open") >= 0 ||
-      q.indexOf("enter") >= 0 ||
-      q.indexOf("position") >= 0 ||
-      q.indexOf("buy") >= 0 ||
-      q.indexOf("sell") >= 0,
+      !longTerm && (
+        q.indexOf("trade") >= 0 ||
+        q.indexOf("open") >= 0 ||
+        q.indexOf("enter") >= 0 ||
+        q.indexOf("position") >= 0 ||
+        q.indexOf("buy") >= 0 ||
+        q.indexOf("sell") >= 0
+      ),
     together:
-      q.indexOf("all") >= 0 ||
-      q.indexOf("together") >= 0 ||
-      q.indexOf("selected assets") >= 0 ||
-      q.indexOf("selected positions") >= 0 ||
-      q.indexOf("basket") >= 0 ||
-      q.indexOf("multiple") >= 0,
+      !longTerm && (
+        q.indexOf("all") >= 0 ||
+        q.indexOf("together") >= 0 ||
+        q.indexOf("selected assets") >= 0 ||
+        q.indexOf("selected positions") >= 0 ||
+        q.indexOf("basket") >= 0 ||
+        q.indexOf("multiple") >= 0
+      ),
+    longTerm: longTerm,
     risk:
       q.indexOf("risk") >= 0 ||
       q.indexOf("danger") >= 0 ||
@@ -2930,6 +2945,151 @@ function aiProfitSentence(d) {
   );
 }
 
+
+function parseHoldingHorizonMonths(question) {
+  var q = String(question || "").toLowerCase().replace(",", ".");
+  var yearMatch = q.match(/(\d+(?:\.\d+)?)\s*(?:year|years|yr|yrs)/);
+  var monthMatch = q.match(/(\d+(?:\.\d+)?)\s*(?:month|months|mo|mos)/);
+
+  if (yearMatch) {
+    return Math.max(1, Math.round(parseFloat(yearMatch[1]) * 12));
+  }
+
+  if (monthMatch) {
+    return Math.max(1, Math.round(parseFloat(monthMatch[1])));
+  }
+
+  if (q.indexOf("long term") >= 0 || q.indexOf("long-term") >= 0) {
+    return 12;
+  }
+
+  return 0;
+}
+
+function horizonLabel(months) {
+  if (!months) return "the longer-term horizon";
+  if (months % 12 === 0) {
+    var years = months / 12;
+    return years === 1 ? "1 year" : years + " years";
+  }
+  if (months > 12) {
+    return (months / 12).toFixed(1).replace(".0","") + " years";
+  }
+  return months === 1 ? "1 month" : months + " months";
+}
+
+function selectedAssetNamesForAI() {
+  var names = [];
+  var i;
+
+  if (!selectedAssets || !selectedAssets.length) return names;
+
+  for (i = 0; i < selectedAssets.length; i++) {
+    if (selectedAssets[i] && selectedAssets[i].symbol) {
+      names.push(selectedAssets[i].symbol);
+    }
+  }
+
+  return names;
+}
+
+function longTermMarketMixText() {
+  if (!selectedAssets || !selectedAssets.length) return "";
+
+  var markets = {};
+  var i;
+  for (i = 0; i < selectedAssets.length; i++) {
+    markets[capitalAssetMarket(selectedAssets[i])] = true;
+  }
+
+  var names = Object.keys(markets);
+  if (!names.length) return "";
+  return names.join(", ");
+}
+
+function answerLongTermQuestion(question) {
+  var state = buildAIState();
+  var d = capitalAdequacyData();
+  var months = parseHoldingHorizonMonths(question);
+  var label = horizonLabel(months);
+  var assetNames = selectedAssetNamesForAI();
+  var mix = longTermMarketMixText();
+  var parts = [];
+
+  if (!state || !state.available || !state.available.length) {
+    return "I need usable market data first. Refresh the selected assets, then I can assess whether the portfolio looks realistic for a longer holding period.";
+  }
+
+  parts.push(
+    "For " + label + ", the selected assets can be assessed as a portfolio, but I would not treat today's Bullish, Neutral or Bearish signals as an " +
+    label +
+    " prediction."
+  );
+
+  if (assetNames.length) {
+    parts.push(
+      "You currently have " +
+      assetNames.join(", ") +
+      " selected" +
+      (mix ? " across " + mix + "." : ".")
+    );
+  }
+
+  if (state.riskLevel === "High") {
+    parts.push(
+      "The current mix has elevated volatility or concentration risk, so a long holding period could involve large swings even if the long-term outcome is positive."
+    );
+  } else if (state.riskLevel === "Moderate") {
+    parts.push(
+      "The current portfolio risk is moderate, which is more workable for a longer hold, but drawdowns and periods of underperformance should still be expected."
+    );
+  } else {
+    parts.push(
+      "The current portfolio risk is relatively lower based on the data loaded today, although that can change over a long holding period."
+    );
+  }
+
+  if (months > 12) {
+    parts.push(
+      "Important: Portfolio AI's current forecast engine only projects out to 1 year, so I should not pretend the dashboard has a reliable " +
+      label +
+      " forecast. Beyond 12 months, this answer is a suitability assessment rather than a forecast."
+    );
+  } else {
+    parts.push(
+      "For this horizon, use the forecast as a scenario range rather than a promise of where the portfolio will end."
+    );
+  }
+
+  if (d && d.capital > 0) {
+    if (d.status === "INSUFFICIENT") {
+      parts.push(
+        "Your current capital of " +
+        plainMoney(d.capital) +
+        " is also below Portfolio AI's practical range for this selection, so fewer assets or additional capital would make the portfolio easier to manage."
+      );
+    } else if (d.status === "LIMITED") {
+      parts.push(
+        "Your current capital of " +
+        plainMoney(d.capital) +
+        " is usable but tight for this selection, so spreading it across too many assets may dilute the position sizes."
+      );
+    } else {
+      parts.push(
+        "Your current capital of " +
+        plainMoney(d.capital) +
+        " is within Portfolio AI's practical range for this selection."
+      );
+    }
+  }
+
+  parts.push(
+    "For a long hold, the more useful questions are diversification, concentration, volatility, capital size and whether you can tolerate the drawdowns — not whether every asset is bullish today."
+  );
+
+  return parts.join(" ");
+}
+
 function answerMultiIntentAIQuestion(question, intents) {
   var state = buildAIState();
   var d = capitalAdequacyData();
@@ -2939,7 +3099,11 @@ function answerMultiIntentAIQuestion(question, intents) {
     return "I need usable market data first. Select assets, refresh the prices and historical data, then ask again.";
   }
 
-  if (intents.trade || intents.together) {
+  if (intents.longTerm) {
+    parts.push(answerLongTermQuestion(question));
+  }
+
+  if ((intents.trade || intents.together) && !intents.longTerm) {
     parts.push(aiTradeSentence(state, d));
   }
 
@@ -3009,12 +3173,16 @@ function answerAIQuestion(question) {
   var intents = aiQuestionIntents(question);
 
   /*
-    v25.8:
-    Do not force a mixed question into one keyword bucket.
-    Trade + capital + profit questions are answered together.
+    v25.9:
+    Long-horizon / holding questions are not short-term trade questions.
+    Mixed questions still combine relevant intents.
   */
   if (aiIntentCount(intents) > 1) {
     return answerMultiIntentAIQuestion(question, intents);
+  }
+
+  if (intents.longTerm) {
+    return answerLongTermQuestion(question);
   }
 
   if (intents.money) {
