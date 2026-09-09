@@ -4765,3 +4765,127 @@ body:before{
     max-width:calc(100vw - 18px)!important;
   }
 }
+
+
+/* =========================================================
+   V25.2 — NAV VISIBILITY + iOS-STYLE ICONS
+========================================================= */
+
+/* Increase contrast of the active glass lens so text stays readable */
+.app-navigation .ios-nav-lens{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.94),rgba(240,244,250,.88))!important;
+  border:1px solid rgba(255,255,255,.96)!important;
+  box-shadow:
+    0 8px 24px rgba(20,30,50,.16),
+    inset 0 1px 0 rgba(255,255,255,1),
+    inset 0 -1px 0 rgba(20,30,50,.035)!important;
+}
+
+[data-theme="dark"] .app-navigation .ios-nav-lens{
+  background:
+    linear-gradient(180deg,rgba(72,72,80,.94),rgba(48,48,56,.90))!important;
+  border-color:rgba(255,255,255,.16)!important;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.13)!important;
+}
+
+/* Selected item must always win over the glass behind it */
+.app-navigation .app-nav-item{
+  color:rgba(60,60,67,.72)!important;
+  font-weight:650!important;
+}
+.app-navigation .app-nav-item.active{
+  color:#111318!important;
+  font-weight:800!important;
+  text-shadow:none!important;
+}
+[data-theme="dark"] .app-navigation .app-nav-item{
+  color:rgba(235,235,245,.62)!important;
+}
+[data-theme="dark"] .app-navigation .app-nav-item.active{
+  color:#ffffff!important;
+}
+
+/* iOS-style nav icon treatment */
+.app-navigation .app-nav-item{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:7px!important;
+  min-height:38px;
+  padding-inline:14px!important;
+}
+.ios-nav-icon{
+  display:inline-grid;
+  place-items:center;
+  width:16px;
+  height:16px;
+  flex:0 0 16px;
+  font-size:12px;
+  line-height:1;
+  opacity:.78;
+  transform:translateY(-.2px);
+  transition:opacity .28s ease,transform .34s cubic-bezier(.2,1.15,.25,1)
+}
+.ios-nav-label{
+  display:inline-block;
+  transition:opacity .28s ease,transform .34s cubic-bezier(.2,1.15,.25,1)
+}
+.app-navigation .app-nav-item.active .ios-nav-icon{
+  opacity:1;
+  transform:translateY(-.2px) scale(1.08)
+}
+.app-navigation .app-nav-item.active .ios-nav-label{
+  opacity:1;
+}
+
+/* Slightly tint the active tab instead of relying on pale blur alone */
+.app-navigation .app-nav-item.active:after{
+  content:"";
+  position:absolute;
+  left:14px;
+  right:14px;
+  bottom:4px;
+  height:2px;
+  border-radius:999px;
+  background:rgba(0,122,255,.72);
+  opacity:.75;
+}
+[data-theme="dark"] .app-navigation .app-nav-item.active:after{
+  background:rgba(10,132,255,.95);
+}
+
+/* Keep inactive tabs subtle but legible */
+@media(hover:hover){
+  .app-navigation .app-nav-item:not(.active):hover{
+    color:#111318!important;
+  }
+  [data-theme="dark"] .app-navigation .app-nav-item:not(.active):hover{
+    color:#fff!important;
+  }
+}
+
+/* Give the whole selector slightly more visual separation from pale page backgrounds */
+.app-navigation{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.62),rgba(248,250,255,.48)),
+    rgba(245,248,252,.42)!important;
+  border-color:rgba(255,255,255,.82)!important;
+}
+[data-theme="dark"] .app-navigation{
+  background:
+    linear-gradient(180deg,rgba(38,38,45,.78),rgba(20,20,26,.66)),
+    rgba(18,18,22,.62)!important;
+}
+
+/* Ensure selected label remains above the moving lens */
+.app-navigation .app-nav-item,
+.app-navigation .app-nav-item *{
+  position:relative;
+  z-index:2;
+}
+.app-navigation .ios-nav-lens{
+  z-index:1!important;
+}
