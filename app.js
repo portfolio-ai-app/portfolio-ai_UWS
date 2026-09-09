@@ -6248,7 +6248,7 @@ function attachIOSMotion() {
     window.setTimeout(function(){ button.classList.remove("ios-press"); }, 280);
   });
 
-  var nav = document.querySelector(".app-nav") || document.querySelector("nav");
+  var nav = document.querySelector(".app-navigation");
   if (nav && !nav.querySelector(".ios-nav-lens")) {
     var lens = document.createElement("span");
     lens.className = "ios-nav-lens";
@@ -7042,3 +7042,35 @@ function setAppView(viewName) {
     initializeApp();
   }
 })();
+
+
+
+function refreshIOSNavLens() {
+  var nav = document.querySelector(".app-navigation");
+  if (!nav) return;
+  var lens = nav.querySelector(".ios-nav-lens");
+  var active = nav.querySelector("[data-app-view].active");
+  if (!lens || !active) return;
+
+  var nr = nav.getBoundingClientRect();
+  var ar = active.getBoundingClientRect();
+
+  lens.style.width = ar.width + "px";
+  lens.style.height = ar.height + "px";
+  lens.style.transform =
+    "translate3d(" +
+    (ar.left - nr.left) +
+    "px," +
+    (ar.top - nr.top) +
+    "px,0)";
+}
+
+document.addEventListener("click", function(event) {
+  if (event.target.closest("[data-app-view],[data-open-view]")) {
+    window.setTimeout(refreshIOSNavLens, 35);
+    window.setTimeout(refreshIOSNavLens, 180);
+  }
+});
+window.addEventListener("resize", refreshIOSNavLens);
+window.setTimeout(refreshIOSNavLens, 250);
+

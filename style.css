@@ -4570,7 +4570,7 @@ body:before{
 }
 
 /* Floating navigation shell + moving glass lens */
-.app-nav,nav{
+.app-navigation{
   position:relative!important;
   overflow:visible!important;
   border:1px solid var(--ios-stroke)!important;
@@ -4580,7 +4580,7 @@ body:before{
   backdrop-filter:blur(34px) saturate(180%)!important;
   transform:translateZ(0)
 }
-.app-nav:before,nav:before{
+.app-navigation:before{
   content:"";position:absolute;left:6%;right:6%;top:0;height:1px;border-radius:999px;
   background:linear-gradient(90deg,transparent,rgba(255,255,255,.82),transparent);pointer-events:none
 }
@@ -4597,11 +4597,11 @@ body:before{
   border-color:rgba(255,255,255,.12);
   box-shadow:0 9px 28px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.10)
 }
-.app-nav [data-app-view],nav [data-app-view]{
+.app-navigation [data-app-view]{
   position:relative;z-index:1;background:transparent!important;
   transition:color .3s ease,transform .3s var(--ios-spring)
 }
-.app-nav [data-app-view].active,nav [data-app-view].active{box-shadow:none!important}
+.app-navigation [data-app-view].active{box-shadow:none!important}
 
 /* Directional push/pop page transitions */
 .app-view{will-change:transform,opacity,filter;transform-origin:50% 35%}
@@ -4674,4 +4674,94 @@ body:before{
   .app-view.view-enter-right,.app-view.view-enter-left,.app-view.view-exit-left,.app-view.view-exit-right,
   .app-view.active > *,.app-view.is-active > *,body:before,.ios-press{animation:none!important}
   .ios-nav-lens{transition:none!important}
+}
+
+
+/* =========================================================
+   V25.1 — NAVIGATION SELECTOR FIX
+   The app's real primary nav is .app-navigation.
+========================================================= */
+.top-nav{
+  border:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+
+/* Primary iOS glass tab bar */
+.app-navigation{
+  position:sticky!important;
+  top:142px!important;
+  z-index:150!important;
+  isolation:isolate;
+  overflow:hidden!important;
+  padding:5px!important;
+  border-radius:999px!important;
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.15),rgba(255,255,255,.035)),
+    var(--ios-glass)!important;
+  border:1px solid var(--ios-stroke)!important;
+  box-shadow:
+    0 18px 55px rgba(0,0,0,.14),
+    inset 0 1px 0 rgba(255,255,255,.18)!important;
+  -webkit-backdrop-filter:blur(34px) saturate(185%)!important;
+  backdrop-filter:blur(34px) saturate(185%)!important;
+}
+
+.app-navigation .app-nav-item{
+  position:relative!important;
+  z-index:2!important;
+  background:transparent!important;
+  box-shadow:none!important;
+}
+
+.app-navigation .ios-nav-lens{
+  z-index:1!important;
+  display:block!important;
+}
+
+/* Keep the navigation readable while it floats above scrolling content */
+.app-navigation:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  z-index:0;
+  pointer-events:none;
+  border-radius:inherit;
+  background:
+    radial-gradient(circle at 20% 0%,rgba(255,255,255,.16),transparent 38%),
+    linear-gradient(120deg,transparent 20%,rgba(255,255,255,.045) 48%,transparent 72%);
+}
+
+[data-theme="dark"] .app-navigation{
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.055),rgba(255,255,255,.012)),
+    rgba(18,18,22,.68)!important;
+}
+
+/* More obvious spring movement for the moving selection lens */
+.app-navigation .ios-nav-lens{
+  transition:
+    transform .52s cubic-bezier(.18,1.22,.28,1),
+    width .52s cubic-bezier(.18,1.22,.28,1),
+    height .52s cubic-bezier(.18,1.22,.28,1)!important;
+}
+
+/* Prevent the old static active fill from masking the moving lens */
+.app-navigation .app-nav-item.active{
+  background:transparent!important;
+}
+
+/* Slightly stronger page movement so the transition is unmistakable */
+.app-view.view-enter-right{animation-duration:.58s!important}
+.app-view.view-enter-left{animation-duration:.58s!important}
+.app-view.view-exit-left{animation-duration:.48s!important}
+.app-view.view-exit-right{animation-duration:.48s!important}
+
+@media(max-width:700px){
+  .app-navigation{
+    top:138px!important;
+    max-width:calc(100vw - 18px)!important;
+  }
 }
