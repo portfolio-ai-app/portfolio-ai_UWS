@@ -4889,3 +4889,167 @@ body:before{
 .app-navigation .ios-nav-lens{
   z-index:1!important;
 }
+
+
+/* =========================================================
+   V25.3 — MOBILE NAVIGATION OPTIMIZATION
+========================================================= */
+
+/* Desktop/tablet stays as the floating iOS glass bar. */
+@media(max-width:700px){
+
+  /* Move the selector into the normal page flow instead of hovering over content. */
+  .app-navigation{
+    position:relative!important;
+    top:auto!important;
+    left:auto!important;
+    right:auto!important;
+    bottom:auto!important;
+    width:calc(100% - 20px)!important;
+    max-width:none!important;
+    margin:10px auto 14px!important;
+    padding:5px!important;
+    border-radius:22px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+    scroll-snap-type:x proximity;
+    box-shadow:
+      0 12px 34px rgba(15,25,45,.10),
+      inset 0 1px 0 rgba(255,255,255,.45)!important;
+  }
+
+  .app-navigation::-webkit-scrollbar{
+    display:none;
+  }
+
+  /* Keep each option readable and tappable. */
+  .app-navigation .app-nav-item{
+    flex:0 0 auto!important;
+    min-width:92px!important;
+    min-height:42px!important;
+    padding:0 12px!important;
+    border-radius:16px!important;
+    scroll-snap-align:center;
+    gap:6px!important;
+    font-size:11px!important;
+  }
+
+  .app-navigation .ios-nav-icon{
+    width:16px!important;
+    height:16px!important;
+    flex-basis:16px!important;
+    font-size:12px!important;
+  }
+
+  .app-navigation .ios-nav-label{
+    white-space:nowrap!important;
+  }
+
+  /* Make the moving lens fit the smaller mobile pills cleanly. */
+  .app-navigation .ios-nav-lens{
+    border-radius:16px!important;
+  }
+
+  /* Prevent content from sitting under the selector. */
+  .app-shell,
+  .app-main,
+  main{
+    padding-top:0!important;
+  }
+}
+
+/* Very small phones: icon-first compact rail, label still visible. */
+@media(max-width:430px){
+  .app-navigation{
+    width:calc(100% - 12px)!important;
+    margin:8px auto 12px!important;
+    padding:4px!important;
+    border-radius:20px!important;
+  }
+
+  .app-navigation .app-nav-item{
+    min-width:82px!important;
+    min-height:40px!important;
+    padding:0 10px!important;
+    gap:5px!important;
+    font-size:10px!important;
+  }
+
+  .app-navigation .app-nav-item.active:after{
+    left:12px!important;
+    right:12px!important;
+    bottom:3px!important;
+  }
+}
+
+/* Landscape phones: keep it compact so it doesn't eat vertical space. */
+@media(max-width:900px) and (orientation:landscape){
+  .app-navigation{
+    width:calc(100% - 24px)!important;
+    margin:6px auto 10px!important;
+    min-height:44px!important;
+  }
+
+  .app-navigation .app-nav-item{
+    min-height:36px!important;
+    min-width:88px!important;
+  }
+}
+
+
+/* =========================================================
+   V25.4 — NAV RECOVERY + MOBILE SAFE LAYOUT
+========================================================= */
+.app-navigation{
+  box-sizing:border-box!important;
+}
+
+@media(max-width:700px){
+  .app-navigation{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:2px!important;
+    position:relative!important;
+    top:auto!important;
+    width:calc(100% - 16px)!important;
+    max-width:100%!important;
+    margin:8px auto 14px!important;
+    padding:4px!important;
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+    white-space:nowrap!important;
+    scrollbar-width:none!important;
+    -webkit-overflow-scrolling:touch!important;
+    scroll-snap-type:x proximity!important;
+  }
+
+  .app-navigation::-webkit-scrollbar{
+    display:none!important;
+  }
+
+  .app-navigation .app-nav-item{
+    display:flex!important;
+    flex:0 0 auto!important;
+    min-width:88px!important;
+    width:auto!important;
+    min-height:40px!important;
+    padding:0 11px!important;
+    scroll-snap-align:center!important;
+  }
+
+  .app-navigation .ios-nav-lens{
+    display:block!important;
+    pointer-events:none!important;
+  }
+}
+
+@media(max-width:390px){
+  .app-navigation .app-nav-item{
+    min-width:80px!important;
+    padding:0 9px!important;
+    font-size:10px!important;
+  }
+}

@@ -6363,7 +6363,46 @@ function setAppView(viewName) {
     );
   }
 
-  function attachAppNavigation() {
+  
+function ensurePrimaryNavigationStructure() {
+  var nav = document.querySelector(".app-navigation");
+  if (!nav) return;
+
+  var expected = [
+    ["overview","⌂","Overview"],
+    ["portfolio","◉","Portfolio"],
+    ["intelligence","✦","Intelligence"],
+    ["trade","↗","Trade"],
+    ["news","▤","News"]
+  ];
+
+  var existing = nav.querySelectorAll("[data-app-view]");
+  if (existing.length === 5) return;
+
+  nav.innerHTML = "";
+
+  expected.forEach(function(item, index){
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "app-nav-item" + (index === 0 ? " active" : "");
+    button.setAttribute("data-app-view", item[0]);
+
+    var icon = document.createElement("span");
+    icon.className = "ios-nav-icon";
+    icon.setAttribute("aria-hidden","true");
+    icon.textContent = item[1];
+
+    var label = document.createElement("span");
+    label.className = "ios-nav-label";
+    label.textContent = item[2];
+
+    button.appendChild(icon);
+    button.appendChild(label);
+    nav.appendChild(button);
+  });
+}
+
+function attachAppNavigation() {
     document.addEventListener(
       "click",
       function (event) {
@@ -7012,7 +7051,8 @@ function setAppView(viewName) {
     updatePortfolioSummary();
     attachEvents();
     attachAppleUX();
-    attachAppNavigation();
+    ensurePrimaryNavigationStructure();
+  attachAppNavigation();
     attachMarketTicker();
     attachPremiumIntelligence();
   attachTradeBeginnerMode();
@@ -7074,3 +7114,35 @@ document.addEventListener("click", function(event) {
 window.addEventListener("resize", refreshIOSNavLens);
 window.setTimeout(refreshIOSNavLens, 250);
 
+
+
+function ensureActiveNavVisible() {
+  var nav = document.querySelector(".app-navigation");
+  if (!nav) return;
+  if (window.innerWidth > 700) return;
+
+  var active = nav.querySelector("[data-app-view].active");
+  if (!active) return;
+
+  try {
+    active.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest"
+    });
+  } catch (e) {
+    nav.scrollLeft = Math.max(0, active.offsetLeft - (nav.clientWidth - active.offsetWidth) / 2);
+  }
+}
+
+document.addEventListener("click", function(event) {
+  if (event.target.closest("[data-app-view]")) {
+    window.setTimeout(ensureActiveNavVisible, 80);
+  }
+});
+
+window.addEventListener("resize", function() {
+  window.setTimeout(ensureActiveNavVisible, 80);
+});
+
+window.setTimeout(ensureActiveNavVisible, 300);
