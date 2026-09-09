@@ -4083,3 +4083,155 @@ footer{color:var(--apple-secondary)}
 .premium-risk-list{display:grid;gap:13px}.premium-risk-row>div:first-child{display:flex;justify-content:space-between;margin-bottom:6px;color:var(--apple-secondary);font-size:9px}.premium-risk-track{height:6px;border-radius:999px;background:rgba(127,127,127,.12);overflow:hidden}.premium-risk-track i{display:block;height:100%;border-radius:inherit;background:var(--apple-blue)}
 .premium-stress-intro strong{color:var(--apple-text);font-size:12px}.premium-stress-intro p{color:var(--apple-secondary);font-size:9px}.premium-stress-presets{display:flex;flex-wrap:wrap;gap:7px;margin-top:14px}.premium-stress-result{display:flex;align-items:baseline;gap:9px;margin-top:14px;padding:15px;border-radius:15px;background:rgba(127,127,127,.055);color:var(--apple-secondary);font-size:9px}.premium-stress-result strong{color:var(--apple-text);font-size:20px}.premium-empty-detail{text-align:center;color:var(--apple-secondary);font-size:9px}.premium-empty-detail strong{color:var(--apple-text)}
 @media(max-width:700px){.premium-intelligence{padding:20px}.premium-intelligence-top{grid-template-columns:1fr}.premium-score-ring{width:88px;height:88px}.premium-horizon{align-items:flex-start;flex-direction:column}.premium-segmented{width:100%;overflow-x:auto}.premium-snapshot-grid,.premium-scenario-grid{grid-template-columns:1fr}}
+
+
+/* =========================================================
+   V22.1 — CAPITAL ADEQUACY
+========================================================= */
+.capital-check-card{
+  margin-top:14px;
+  padding:19px;
+  border:1px solid var(--apple-hairline);
+  border-radius:20px;
+  background:color-mix(in srgb,var(--apple-card-solid) 76%,transparent);
+}
+
+.capital-check-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+}
+
+.capital-status-line{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:6px;
+}
+
+.capital-status-line strong{
+  color:var(--apple-text);
+  font-size:21px;
+  letter-spacing:-.04em;
+}
+
+.capital-status-line span{
+  padding:4px 8px;
+  border-radius:999px;
+  background:rgba(127,127,127,.08);
+  color:var(--apple-secondary);
+  font-size:8px;
+  font-weight:700;
+}
+
+.capital-amount{
+  text-align:right;
+}
+
+.capital-amount span{
+  display:block;
+  color:var(--apple-secondary);
+  font-size:7px;
+  font-weight:750;
+  letter-spacing:.1em;
+}
+
+.capital-amount strong{
+  display:block;
+  margin-top:5px;
+  color:var(--apple-text);
+  font-size:19px;
+  letter-spacing:-.035em;
+}
+
+.capital-check-card > p{
+  margin:12px 0 0;
+  max-width:760px;
+  color:var(--apple-secondary);
+  font-size:10px;
+  line-height:1.55;
+}
+
+.capital-check-grid{
+  display:grid;
+  grid-template-columns:1.25fr .75fr 1fr;
+  gap:8px;
+  margin-top:15px;
+}
+
+.capital-check-grid article{
+  padding:13px;
+  border:1px solid var(--apple-hairline);
+  border-radius:15px;
+  background:rgba(127,127,127,.035);
+}
+
+.capital-check-grid span,
+.capital-check-grid small{
+  display:block;
+  color:var(--apple-secondary);
+}
+
+.capital-check-grid span{
+  font-size:8px;
+  font-weight:650;
+}
+
+.capital-check-grid strong{
+  display:block;
+  margin:8px 0 3px;
+  color:var(--apple-text);
+  font-size:15px;
+}
+
+.capital-check-grid small{
+  font-size:7px;
+  line-height:1.4;
+}
+
+.capital-guidance{
+  margin-top:10px;
+  padding:11px 13px;
+  border-radius:13px;
+  background:rgba(0,113,227,.05);
+}
+
+.capital-guidance strong{
+  color:var(--apple-text);
+  font-size:8px;
+}
+
+.capital-guidance p{
+  margin:3px 0 0;
+  color:var(--apple-secondary);
+  font-size:8px;
+  line-height:1.45;
+}
+
+.capital-check-card[data-capital-status="sufficient"] .capital-status-line strong{
+  color:#34c759;
+}
+
+.capital-check-card[data-capital-status="limited"] .capital-status-line strong{
+  color:#ff9f0a;
+}
+
+.capital-check-card[data-capital-status="insufficient"] .capital-status-line strong{
+  color:#ff453a;
+}
+
+@media(max-width:700px){
+  .capital-check-head{
+    flex-direction:column;
+  }
+
+  .capital-amount{
+    text-align:left;
+  }
+
+  .capital-check-grid{
+    grid-template-columns:1fr;
+  }
+}

@@ -5722,7 +5722,162 @@
     return ((med-inv)/inv)*premiumFactor();
   }
 
+
+  function capitalAssetMarket(asset) {
+    var value = String(
+      asset && (
+        asset.marketType ||
+        asset.category ||
+        asset.type ||
+        asset.assetType ||
+        asset.market ||
+        ""
+      )
+    ).toLowerCase();
+
+    if (value.indexOf("forex") >= 0 || value.indexOf("fx") >= 0) return "Forex";
+    if (value.indexOf("crypto") >= 0) return "Crypto";
+    if (value.indexOf("commod") >= 0 || value.indexOf("metal") >= 0) return "Commodities";
+    if (value.indexOf("etf") >= 0 || value.indexOf("fund") >= 0) return "ETF";
+    return "Stocks";
+  }
+
+  function capitalNumber(id, fallback) {
+    var node = el(id);
+    var value = Number(node ? node.value : fallback);
+    return isFinite(value) ? value : fallback;
+  }
+
+  function capitalAdequacyData() {
+    var capital = capitalNumber("investment", 0);
+    var assets = selectedAssets || [];
+    var count = assets.length;
+
+    if (!capital || capital <= 0 || !count) {
+      return {
+        status: "WAITING",
+        badge: "Portfolio required",
+        capital: capital,
+        count: count,
+        minimum: 0,
+        comfortable: 0,
+        perAsset: count ? capital / count : 0,
+        markets: [],
+        message: "Enter your USD investment amount and select assets to check whether the capital is practical for the portfolio."
+      };
+    }
+
+    var riskPct = capitalNumber("riskPerTrade", 1);
+    var stopPct = capitalNumber("stopDistance", 2);
+    var markets = [];
+    var weights = {
+      "Stocks": 1.00,
+      "ETF": 0.85,
+      "Forex": 1.15,
+      "Crypto": 0.65,
+      "Commodities": 1.20
+    };
+
+    var complexity = 0;
+    assets.forEach(function(asset){
+      var market = capitalAssetMarket(asset);
+      if (markets.indexOf(market) < 0) markets.push(market);
+      complexity += weights[market] || 1;
+    });
+
+    /*
+      Practical-capital heuristic:
+      - $500 base working allocation per average selected instrument.
+      - Market complexity adjusts the base.
+      - Tighter risk budgets and tighter stops require more capital headroom.
+      - This is a portfolio practicality assessment, not a broker minimum.
+    */
+    var basePerAsset = 500;
+    var riskAdjustment = riskPct > 0 ? premiumClamp(1 / riskPct, 0.65, 2.0) : 2;
+    var stopAdjustment = stopPct > 0 ? premiumClamp(2 / stopPct, 0.70, 1.65) : 1.65;
+    var diversificationAdjustment = count >= 4 ? 1.10 : 1;
+    var marketAdjustment = complexity / count;
+
+    var minimum = basePerAsset * count * marketAdjustment * riskAdjustment * stopAdjustment;
+    minimum *= diversificationAdjustment;
+    minimum = Math.ceil(minimum / 100) * 100;
+
+    var comfortable = Math.ceil((minimum * 1.35) / 100) * 100;
+    var ratio = capital / minimum;
+
+    var status, badge, message;
+
+    if (ratio >= 1.35) {
+      status = "SUFFICIENT";
+      badge = "Well funded";
+      message = "Your capital is sufficient for this selected portfolio under the current Portfolio AI risk and sizing assumptions. You have useful headroom for diversification and position sizing.";
+    } else if (ratio >= 1) {
+      status = "SUFFICIENT";
+      badge = "Practical";
+      message = "Your capital is sufficient for the selected portfolio, although position sizes may be relatively modest. The current mix remains practical under your risk settings.";
+    } else if (ratio >= 0.65) {
+      status = "LIMITED";
+      badge = "Usable with constraints";
+      message = "Your capital can support this portfolio, but spreading it across all selected assets may create small positions. Fewer assets or additional capital would improve flexibility.";
+    } else {
+      status = "INSUFFICIENT";
+      badge = "Capital constrained";
+      message = "Your capital is not practical for the full selected portfolio under the current risk settings. Consider reducing the number of assets, widening the capital base, or reviewing the risk setup.";
+    }
+
+    return {
+      status: status,
+      badge: badge,
+      capital: capital,
+      count: count,
+      minimum: minimum,
+      comfortable: comfortable,
+      perAsset: capital / count,
+      markets: markets,
+      message: message
+    };
+  }
+
+  function capitalUSD(value) {
+    if (!isFinite(value)) return "$—";
+    return "$" + Number(value).toLocaleString("en-US", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    });
+  }
+
+  function updateCapitalAdequacy() {
+    var d = capitalAdequacyData();
+    var status = el("capitalStatus");
+    var badge = el("capitalStatusBadge");
+    var available = el("capitalAvailable");
+    var recommended = el("capitalRecommended");
+    var count = el("capitalAssetCount");
+    var mix = el("capitalMarketMix");
+    var perAsset = el("capitalPerAsset");
+    var message = el("capitalMessage");
+    var card = el("capitalCheckCard");
+
+    if (status) status.textContent = d.status;
+    if (badge) badge.textContent = d.badge;
+    if (available) available.textContent = d.capital > 0 ? capitalUSD(d.capital) : "$—";
+    if (recommended) {
+      recommended.textContent = d.minimum > 0
+        ? capitalUSD(d.minimum) + "–" + capitalUSD(d.comfortable)
+        : "$—";
+    }
+    if (count) count.textContent = String(d.count);
+    if (mix) mix.textContent = d.markets.length ? d.markets.join(" · ") : "No markets selected";
+    if (perAsset) perAsset.textContent = d.perAsset > 0 ? capitalUSD(d.perAsset) : "$—";
+    if (message) message.textContent = d.message;
+
+    if (card) {
+      card.setAttribute("data-capital-status", d.status.toLowerCase());
+    }
+  }
+
   function updatePremiumIntelligence(){
+    updateCapitalAdequacy();
     var d=premiumData(), o=el("premiumOutlook"),c=el("premiumConfidence"),sc=el("premiumScore"),b=el("premiumBrief"),
         ba=el("premiumBestAsset"),bn=el("premiumBestAssetNote"),ra=el("premiumRiskAsset"),ex=el("premiumExpected"),en=el("premiumExpectedNote");
     if(!d){
@@ -5779,6 +5934,15 @@
       var s=e.target.closest("[data-stress-value]");
       if(s){var r=el("premiumStressResult"),shock=Number(s.getAttribute("data-stress-value")),impact=selectedAssets.length?shock/selectedAssets.length:0;if(r)r.innerHTML='<span>Approx. portfolio impact</span><strong>'+(impact>=0?"+":"")+impact.toFixed(1)+'%</strong><small>Equal-weight sensitivity estimate</small>';}
     });
+    var capitalInputs = ["investment","riskPerTrade","stopDistance"];
+    capitalInputs.forEach(function(id){
+      var node = el(id);
+      if (node) {
+        node.addEventListener("input", updateCapitalAdequacy);
+        node.addEventListener("change", updateCapitalAdequacy);
+      }
+    });
+
     updatePremiumIntelligence();
   }
 

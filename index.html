@@ -368,6 +368,47 @@
     <article><span>Highest uncertainty</span><strong id="premiumRiskAsset">—</strong><small>Current volatility leader</small></article>
     <article><span>Expected outcome</span><strong id="premiumExpected">—</strong><small id="premiumExpectedNote">Selected horizon</small></article>
   </div>
+  <section class="capital-check-card" id="capitalCheckCard">
+    <div class="capital-check-head">
+      <div>
+        <span class="section-kicker">CAPITAL ADEQUACY</span>
+        <div class="capital-status-line">
+          <strong id="capitalStatus">WAITING</strong>
+          <span id="capitalStatusBadge">Run analysis</span>
+        </div>
+      </div>
+      <div class="capital-amount">
+        <span>AVAILABLE CAPITAL</span>
+        <strong id="capitalAvailable">$—</strong>
+      </div>
+    </div>
+
+    <p id="capitalMessage">Select assets and run the analysis to check whether your USD capital is practical for the portfolio you selected.</p>
+
+    <div class="capital-check-grid">
+      <article>
+        <span>Portfolio AI range</span>
+        <strong id="capitalRecommended">$—</strong>
+        <small>Practical capital range for the selected mix</small>
+      </article>
+      <article>
+        <span>Selected assets</span>
+        <strong id="capitalAssetCount">0</strong>
+        <small id="capitalMarketMix">No markets selected</small>
+      </article>
+      <article>
+        <span>Capital per asset</span>
+        <strong id="capitalPerAsset">$—</strong>
+        <small>Equal-allocation reference</small>
+      </article>
+    </div>
+
+    <div class="capital-guidance" id="capitalGuidance">
+      <strong>What Portfolio AI checks</strong>
+      <p>Portfolio size, selected markets, current prices where available, risk per trade, stop distance and practical position sizing.</p>
+    </div>
+  </section>
+
   <div class="premium-actions">
     <button type="button" data-premium-panel="why">Why this outlook?</button><button type="button" data-premium-panel="scenarios">Scenarios</button>
     <button type="button" data-premium-panel="risk">Risk radar</button><button type="button" data-premium-panel="whatif">Stress test</button>
