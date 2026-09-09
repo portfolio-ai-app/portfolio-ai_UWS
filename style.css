@@ -2361,3 +2361,189 @@ button,input,select{font:inherit} button{color:inherit} button:focus-visible,inp
     grid-template-columns:1fr;
   }
 }
+
+
+/* =========================================================
+   V18 — APPLE-INSPIRED PRODUCT EXPERIENCE
+========================================================= */
+:root{
+  --apple-bg:#f5f5f7;
+  --apple-card:rgba(255,255,255,.80);
+  --apple-card-solid:#ffffff;
+  --apple-text:#1d1d1f;
+  --apple-secondary:#6e6e73;
+  --apple-hairline:rgba(0,0,0,.08);
+  --apple-blue:#0071e3;
+  --apple-blue-hover:#0077ed;
+  --apple-shadow:0 18px 50px rgba(0,0,0,.07);
+  --apple-radius:28px;
+}
+[data-theme="dark"]{
+  --apple-bg:#000;
+  --apple-card:rgba(28,28,30,.80);
+  --apple-card-solid:#1c1c1e;
+  --apple-text:#f5f5f7;
+  --apple-secondary:#a1a1a6;
+  --apple-hairline:rgba(255,255,255,.10);
+  --apple-shadow:0 18px 60px rgba(0,0,0,.28);
+}
+html{scroll-behavior:smooth;scroll-padding-top:112px}
+body{
+  background:
+    radial-gradient(circle at 50% -10%,rgba(0,113,227,.06),transparent 30%),
+    var(--apple-bg);
+  color:var(--apple-text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Helvetica Neue",Arial,sans-serif;
+  letter-spacing:-.01em
+}
+.top-nav{
+  position:sticky;top:0;z-index:120;
+  backdrop-filter:saturate(180%) blur(22px);
+  -webkit-backdrop-filter:saturate(180%) blur(22px);
+  background:color-mix(in srgb,var(--apple-bg) 78%,transparent);
+  border-bottom:1px solid var(--apple-hairline)
+}
+.brand-copy strong{letter-spacing:-.025em}
+.brand-copy small,.system-pill,.theme-toggle-label{color:var(--apple-secondary)}
+
+.apple-hero{
+  max-width:1180px;margin:0 auto;padding:88px 24px 66px;
+  display:grid;grid-template-columns:minmax(0,1.08fr) minmax(320px,.72fr);
+  gap:54px;align-items:center
+}
+.apple-hero .hero-copy{max-width:760px}
+.apple-hero h1{
+  margin:12px 0 18px;
+  font-size:clamp(48px,6.6vw,86px);line-height:.95;
+  letter-spacing:-.065em;font-weight:700;color:var(--apple-text)
+}
+.apple-hero h1 span{display:block;margin-top:8px;color:var(--apple-secondary)}
+.apple-hero p{
+  max-width:700px;font-size:clamp(17px,2vw,21px);
+  line-height:1.45;letter-spacing:-.025em;color:var(--apple-secondary)
+}
+.hero-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+.primary-hero-button,.secondary-hero-button{
+  display:inline-flex;align-items:center;justify-content:center;min-height:44px;
+  padding:0 19px;border-radius:999px;text-decoration:none;font-size:14px;
+  font-weight:650;transition:transform .18s ease,background .18s ease
+}
+.primary-hero-button{background:var(--apple-blue);color:#fff}
+.primary-hero-button:hover{background:var(--apple-blue-hover);transform:translateY(-1px)}
+.secondary-hero-button{color:var(--apple-blue);background:rgba(0,113,227,.08)}
+.secondary-hero-button:hover{background:rgba(0,113,227,.12)}
+.hero-trust-row{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:26px;color:var(--apple-secondary);font-size:12px}
+.hero-trust-row span::before{content:"✓";margin-right:6px;color:#30d158;font-weight:800}
+
+.hero-product-card{
+  position:relative;min-height:390px;padding:26px;overflow:hidden;
+  border:1px solid var(--apple-hairline);border-radius:34px;
+  background:linear-gradient(180deg,rgba(255,255,255,.18),transparent),var(--apple-card);
+  box-shadow:0 34px 90px rgba(0,0,0,.10);
+  backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px)
+}
+.hero-product-card::before{
+  content:"";position:absolute;width:240px;height:240px;right:-80px;top:-110px;
+  border-radius:50%;background:rgba(0,113,227,.16);filter:blur(10px)
+}
+.hero-product-top,.hero-product-footer{
+  position:relative;display:flex;align-items:center;gap:8px;color:var(--apple-secondary);font-size:11px
+}
+.hero-product-top strong,.hero-product-footer strong{margin-left:auto;color:var(--apple-text)}
+.hero-product-dot{width:8px;height:8px;border-radius:50%;background:#30d158}
+.hero-product-value{position:relative;margin-top:58px;font-size:52px;line-height:1;font-weight:700;letter-spacing:-.055em;color:var(--apple-text)}
+.hero-product-caption{margin-top:8px;color:var(--apple-secondary);font-size:12px}
+.hero-product-bars{height:118px;margin:30px 0 22px;display:flex;align-items:flex-end;gap:8px}
+.hero-product-bars span{flex:1;min-width:8px;border-radius:999px;background:linear-gradient(180deg,#2997ff,#0071e3);opacity:.8}
+
+.container{max-width:1180px}
+.section-dock{
+  position:sticky;top:72px;z-index:100;display:flex;justify-content:center;gap:4px;
+  width:max-content;max-width:calc(100vw - 32px);margin:0 auto 28px;padding:5px;
+  overflow:auto;border:1px solid var(--apple-hairline);border-radius:999px;
+  background:color-mix(in srgb,var(--apple-card-solid) 78%,transparent);
+  box-shadow:0 10px 30px rgba(0,0,0,.06);
+  backdrop-filter:blur(22px);-webkit-backdrop-filter:blur(22px)
+}
+.section-dock-link{
+  display:inline-flex;align-items:center;gap:7px;flex:0 0 auto;padding:9px 13px;
+  border-radius:999px;color:var(--apple-secondary);text-decoration:none;font-size:11px;font-weight:650;
+  transition:background .18s ease,color .18s ease
+}
+.section-dock-link span{
+  display:inline-grid;place-items:center;width:18px;height:18px;border-radius:50%;
+  background:rgba(127,127,127,.12);font-size:9px
+}
+.section-dock-link:hover,.section-dock-link.active{background:var(--apple-text);color:var(--apple-bg)}
+
+.welcome-card{
+  margin-bottom:24px;padding:30px;border:1px solid var(--apple-hairline);
+  border-radius:var(--apple-radius);background:var(--apple-card);box-shadow:var(--apple-shadow);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)
+}
+.welcome-copy{max-width:700px}
+.welcome-copy h2{margin:5px 0 6px;font-size:32px;line-height:1.05;letter-spacing:-.045em}
+.welcome-copy p{margin:0;color:var(--apple-secondary);font-size:14px;line-height:1.55}
+.welcome-steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:22px}
+.welcome-step{display:flex;gap:12px;padding:16px;border-radius:18px;background:color-mix(in srgb,var(--apple-card-solid) 72%,transparent);border:1px solid var(--apple-hairline)}
+.welcome-step>span{display:grid;place-items:center;flex:0 0 30px;width:30px;height:30px;border-radius:50%;background:var(--apple-text);color:var(--apple-bg);font-size:11px;font-weight:750}
+.welcome-step strong,.welcome-step small{display:block}
+.welcome-step strong{color:var(--apple-text);font-size:12px}
+.welcome-step small{margin-top:4px;color:var(--apple-secondary);font-size:10px;line-height:1.45}
+
+.apple-section,.glass-card{
+  border-color:var(--apple-hairline);border-radius:var(--apple-radius);
+  background:var(--apple-card);box-shadow:var(--apple-shadow);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px)
+}
+.section-header h2{letter-spacing:-.04em}
+.section-header p,.plan-limit-note,.news-provider-hint,.news-meta{color:var(--apple-secondary)}
+.section-kicker,.eyebrow{color:var(--apple-blue);font-weight:750;letter-spacing:.1em}
+
+input,select,.asset-search,.money-input,.percent-input{border-color:var(--apple-hairline)!important;border-radius:14px!important}
+input:focus,select:focus{outline:none;box-shadow:0 0 0 4px rgba(0,113,227,.12)}
+button{-webkit-tap-highlight-color:transparent}
+.action-bar button,#loadMarketData,#generatePortfolio,#aiAskButton{min-height:44px;border-radius:999px!important;font-weight:650}
+#loadMarketData,#generatePortfolio,#aiAskButton{background:var(--apple-blue)}
+
+.analysis-ready-note{
+  display:flex;align-items:flex-start;gap:10px;margin:16px 0 10px;padding:13px 15px;
+  border:1px solid rgba(48,209,88,.18);border-radius:16px;background:rgba(48,209,88,.07)
+}
+.analysis-ready-icon{display:grid;place-items:center;flex:0 0 24px;width:24px;height:24px;border-radius:50%;background:#30d158;color:#fff;font-size:11px;font-weight:800}
+.analysis-ready-note strong,.analysis-ready-note span{display:block}
+.analysis-ready-note strong{color:var(--apple-text);font-size:11px}
+.analysis-ready-note span{margin-top:3px;color:var(--apple-secondary);font-size:9px;line-height:1.5}
+
+.market-tab,.news-tab,.ai-prompt-chip,.freeze-portfolio-button,.trade-guide-toggle,.icon-button{
+  transition:transform .16s ease,background .16s ease,border-color .16s ease
+}
+.market-tab:hover,.news-tab:hover,.ai-prompt-chip:hover,.freeze-portfolio-button:hover,.trade-guide-toggle:hover,.icon-button:hover{transform:translateY(-1px)}
+.selected-asset-chip,.asset-card,.news-card,.trade-plan-card,.ai-signal-card,.scenario-card{border-color:var(--apple-hairline)!important}
+.portfolio-freeze-shell.is-frozen{
+  top:122px;background:color-mix(in srgb,var(--apple-card-solid) 88%,transparent);
+  box-shadow:0 18px 50px rgba(0,0,0,.10)
+}
+.trade-size-primary strong,.trade-summary-card strong,.kpi-card strong{letter-spacing:-.035em}
+footer{color:var(--apple-secondary)}
+
+@media(max-width:900px){
+  .apple-hero{grid-template-columns:1fr;padding-top:54px}
+  .hero-product-card{min-height:320px}
+  .welcome-steps{grid-template-columns:1fr}
+}
+@media(max-width:700px){
+  .section-dock{justify-content:flex-start;top:64px}
+  .section-dock-link{padding:8px 10px}
+  .section-dock-link span{display:none}
+  .apple-hero{padding:42px 18px 44px}
+  .apple-hero h1{font-size:44px}
+  .hero-product-card{min-height:280px;border-radius:26px}
+  .welcome-card{padding:22px}
+  .apple-section,.glass-card{border-radius:22px}
+  .portfolio-freeze-shell.is-frozen{top:108px}
+}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition:none!important}
+}

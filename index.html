@@ -1,15 +1,3 @@
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Portfolio AI market intelligence, portfolio analysis and risk-based trade planning dashboard.">
-  <title>Portfolio AI — Market Intelligence</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
-  <script src="app.js" defer></script>
-</head>
-<body>
 <div class="app-shell">
   <nav class="top-nav">
     <a class="brand" href="#" aria-label="Portfolio AI home">
@@ -29,19 +17,66 @@
     </div>
   </nav>
 
-  <header class="hero">
+  <header class="hero apple-hero" id="overview">
     <div class="hero-copy">
-      <span class="eyebrow">QUANTITATIVE PORTFOLIO INTELLIGENCE</span>
-      <h1>Build smarter.<span>See what could happen.</span></h1>
-      <p>Explore live markets, build a mixed-asset portfolio, follow financial news and model thousands of possible future outcomes.</p>
+      <span class="eyebrow">PORTFOLIO AI</span>
+      <h1>Markets, made clearer.<span>One portfolio. One intelligent view.</span></h1>
+      <p>Build a portfolio, understand what the signals mean, size trades around your risk, and explore possible outcomes — without needing to be a market expert.</p>
+      <div class="hero-actions">
+        <a class="primary-hero-button" href="#build">Build my portfolio</a>
+        <a class="secondary-hero-button" href="#learn">See how it works</a>
+      </div>
+      <div class="hero-trust-row">
+        <span>Live market data</span>
+        <span>Risk-based sizing</span>
+        <span>Scenario forecasting</span>
+      </div>
     </div>
-    <div class="hero-visual" aria-hidden="true"><div class="hero-glow glow-one"></div><div class="hero-glow glow-two"></div><div class="hero-glow glow-three"></div></div>
+
+    <div class="hero-product-card" aria-hidden="true">
+      <div class="hero-product-top">
+        <span class="hero-product-dot"></span>
+        <span>Portfolio overview</span>
+        <strong>Ready</strong>
+      </div>
+      <div class="hero-product-value">$10,000</div>
+      <div class="hero-product-caption">Starting portfolio</div>
+      <div class="hero-product-bars">
+        <span style="height:35%"></span><span style="height:48%"></span><span style="height:42%"></span>
+        <span style="height:62%"></span><span style="height:58%"></span><span style="height:76%"></span>
+        <span style="height:70%"></span><span style="height:88%"></span>
+      </div>
+      <div class="hero-product-footer">
+        <span>Forecast</span>
+        <strong>Explore possibilities</strong>
+      </div>
+    </div>
   </header>
 
   <main class="container">
-    <section class="glass-card configuration-card">
+    <nav class="section-dock" aria-label="Portfolio AI sections">
+      <a href="#build" class="section-dock-link active"><span>1</span>Build</a>
+      <a href="#markets" class="section-dock-link"><span>2</span>Markets</a>
+      <a href="#intelligence" class="section-dock-link"><span>3</span>AI Guidance</a>
+      <a href="#trade" class="section-dock-link"><span>4</span>Trade Planner</a>
+      <a href="#forecast" class="section-dock-link"><span>5</span>Forecast</a>
+    </nav>
+
+    <section class="welcome-card" id="learn">
+      <div class="welcome-copy">
+        <span class="section-kicker">START HERE</span>
+        <h2>Three steps. That’s it.</h2>
+        <p>Portfolio AI explains the numbers as it goes, so a first-time investor can follow the same workflow as an experienced trader.</p>
+      </div>
+      <div class="welcome-steps">
+        <div class="welcome-step"><span>1</span><div><strong>Choose assets</strong><small>Mix stocks, ETFs, forex, crypto and commodities.</small></div></div>
+        <div class="welcome-step"><span>2</span><div><strong>Load intelligence</strong><small>See prices, trend, momentum and portfolio guidance.</small></div></div>
+        <div class="welcome-step"><span>3</span><div><strong>Plan the risk</strong><small>Understand position size, stop loss, take profit and forecast scenarios.</small></div></div>
+      </div>
+    </section>
+    <section class="glass-card configuration-card apple-section" id="build">
       <div class="section-header">
-        <div><span class="section-kicker">YOUR PORTFOLIO</span><h2>Configure analysis</h2><p>Define your starting capital, strategy and forecast parameters.</p></div>
+        <div><span class="section-kicker">STEP 1 · SETUP</span><h2>Tell us how you want to invest</h2><p>Start with your capital and choose whether you’re thinking like an investor or a trader. You can change these settings anytime.</p></div>
         <div class="analysis-badge">Monte Carlo</div>
       </div>
 
@@ -57,9 +92,9 @@
       </div>
     </section>
 
-    <section class="glass-card news-hub-card">
+    <section class="glass-card news-hub-card apple-section" id="markets">
       <div class="section-header news-heading">
-        <div><span class="section-kicker">MARKET NEWS</span><h2>Financial news hub</h2><p>Live financial headlines powered by GDELT, with portfolio-aware filtering and local sentiment scoring.</p></div>
+        <div><span class="section-kicker">STEP 2 · MARKET CONTEXT</span><h2>What’s moving the market?</h2><p>Follow the headlines around your portfolio and the broader market without leaving the dashboard.</p></div>
         <button type="button" id="newsRefresh" class="icon-button" title="Refresh news" aria-label="Refresh news">↻</button>
       </div>
 
@@ -78,16 +113,16 @@
       <div id="newsGrid" class="news-grid"><div class="catalog-loader"><span></span><p>Loading financial news…</p></div></div>
     </section>
 
-    <section class="glass-card asset-browser-card">
+    <section class="glass-card asset-browser-card apple-section">
       <div class="section-header asset-header">
-        <div><span class="section-kicker">TWELVE DATA UNIVERSE</span><h2>Choose assets</h2><p>Search and combine instruments across multiple markets.</p></div>
+        <div><span class="section-kicker">BUILD YOUR PORTFOLIO</span><h2>Choose what you want to follow</h2><p>Search by company, ticker or market. You can combine different asset classes in the same analysis.</p></div>
         <div class="selection-count"><strong id="assetCount">0</strong><span>selected</span></div>
       </div>
       <div class="plan-limit-row">
         <div id="planLimitBadge" class="plan-limit-badge">
           Starter access · <strong id="planLimitCount">0 / 4</strong> assets selected
         </div>
-        <span class="plan-limit-note">Browse the full supported catalogue. Starter access supports up to 4 assets per analysis.</span>
+        <span class="plan-limit-note">Choose up to 4 assets for one analysis. You can remove or replace them at any time.</span>
       </div>
 
       <div id="portfolioFreezeShell" class="portfolio-freeze-shell">
@@ -170,7 +205,7 @@
     </section>
 
 
-    <section class="glass-card ai-advisor-card">
+    <section class="glass-card ai-advisor-card apple-section" id="intelligence">
       <div class="section-header compact ai-advisor-header">
         <div>
           <span class="section-kicker">PORTFOLIO AI</span>
@@ -218,7 +253,7 @@
       </div>
     </section>
 
-    <section class="glass-card trade-planner-card">
+    <section class="glass-card trade-planner-card apple-section" id="trade">
       <div class="section-header compact">
         <div>
           <span class="section-kicker">RISK & EXECUTION</span>
@@ -320,7 +355,7 @@
     </section>
 
 
-    <section class="kpi-grid forecast-kpis">
+    <section class="kpi-grid forecast-kpis" id="forecast">
       <article class="kpi-card">
         <div class="kpi-icon">$</div>
         <div class="kpi-label">Expected value</div>
@@ -394,6 +429,3 @@
     <footer class="app-footer"><strong>Portfolio AI</strong><p>For research and demonstration purposes only. Simulations are not financial advice and do not guarantee future performance.</p></footer>
   </main>
 </div>
-
-</body>
-</html>

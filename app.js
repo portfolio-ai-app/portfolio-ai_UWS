@@ -5478,6 +5478,90 @@
   }
 
 
+  function updateSectionDock() {
+    var links =
+      Array.prototype.slice.call(
+        document.querySelectorAll(
+          ".section-dock-link"
+        )
+      );
+
+    if (!links.length) {
+      return;
+    }
+
+    var currentId = "build";
+
+    links.forEach(
+      function (link) {
+        var href =
+          link.getAttribute("href");
+
+        if (!href) return;
+
+        var target =
+          document.querySelector(href);
+
+        if (
+          target &&
+          target.getBoundingClientRect().top <= 170
+        ) {
+          currentId =
+            href.replace("#", "");
+        }
+      }
+    );
+
+    links.forEach(
+      function (link) {
+        link.classList.toggle(
+          "active",
+          link.getAttribute("href") ===
+          "#" + currentId
+        );
+      }
+    );
+  }
+
+  function attachAppleUX() {
+    var dockLinks =
+      document.querySelectorAll(
+        ".section-dock-link"
+      );
+
+    Array.prototype.forEach.call(
+      dockLinks,
+      function (link) {
+        link.addEventListener(
+          "click",
+          function () {
+            Array.prototype.forEach.call(
+              dockLinks,
+              function (item) {
+                item.classList.remove(
+                  "active"
+                );
+              }
+            );
+
+            link.classList.add(
+              "active"
+            );
+          }
+        );
+      }
+    );
+
+    window.addEventListener(
+      "scroll",
+      updateSectionDock,
+      { passive: true }
+    );
+
+    updateSectionDock();
+  }
+
+
   function attachEvents() {
     var freezePortfolio =
       el("freezePortfolio");
@@ -5772,6 +5856,7 @@
     renderAIAdvisor();
     updatePortfolioSummary();
     attachEvents();
+    attachAppleUX();
     restorePortfolioFrozen();
     setStatus("Ready", "ready");
 
