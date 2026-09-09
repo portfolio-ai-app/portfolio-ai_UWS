@@ -5053,3 +5053,65 @@ body:before{
     font-size:10px!important;
   }
 }
+
+
+/* =========================================================
+   V25.5 — MODERN iOS-STYLE VECTOR NAV ICONS
+========================================================= */
+.app-navigation .ios-nav-icon{
+  width:17px!important;
+  height:17px!important;
+  flex:0 0 17px!important;
+  display:grid!important;
+  place-items:center!important;
+  opacity:.72!important;
+  transform:none!important;
+}
+
+.app-navigation .ios-nav-icon svg{
+  width:17px!important;
+  height:17px!important;
+  display:block!important;
+  overflow:visible;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.75;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  vector-effect:non-scaling-stroke;
+  transition:
+    transform .42s cubic-bezier(.2,1.15,.25,1),
+    stroke-width .25s ease,
+    opacity .25s ease;
+}
+
+.app-navigation .app-nav-item.active .ios-nav-icon{
+  opacity:1!important;
+}
+
+.app-navigation .app-nav-item.active .ios-nav-icon svg{
+  transform:scale(1.06);
+  stroke-width:2;
+}
+
+/* Keep the look monochrome and system-like rather than emoji-like. */
+.app-navigation .app-nav-item{
+  font-variant-emoji:text;
+}
+
+@media(hover:hover){
+  .app-navigation .app-nav-item:not(.active):hover .ios-nav-icon svg{
+    transform:translateY(-1px) scale(1.04);
+  }
+}
+
+@media(max-width:430px){
+  .app-navigation .ios-nav-icon,
+  .app-navigation .ios-nav-icon svg{
+    width:16px!important;
+    height:16px!important;
+  }
+  .app-navigation .ios-nav-icon{
+    flex-basis:16px!important;
+  }
+}

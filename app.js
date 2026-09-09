@@ -6369,11 +6369,11 @@ function ensurePrimaryNavigationStructure() {
   if (!nav) return;
 
   var expected = [
-    ["overview","⌂","Overview"],
-    ["portfolio","◉","Portfolio"],
-    ["intelligence","✦","Intelligence"],
-    ["trade","↗","Trade"],
-    ["news","▤","News"]
+    ["overview","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M4.5 10.5 12 4l7.5 6.5\"/><path d=\"M6.5 9.5v9.5h11V9.5\"/><path d=\"M9.5 19v-5.5h5V19\"/></svg>","Overview"],
+    ["portfolio","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"3.5\" y=\"6.5\" width=\"17\" height=\"12.5\" rx=\"3\"/><path d=\"M8 6.5V5.3A2.3 2.3 0 0 1 10.3 3h3.4A2.3 2.3 0 0 1 16 5.3v1.2\"/><path d=\"M3.5 11.5h17\"/><path d=\"M10 11.5v1.7h4v-1.7\"/></svg>","Portfolio"],
+    ["intelligence","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M12 3.2 13.8 8l4.8 1.8-4.8 1.8-1.8 4.8-1.8-4.8-4.8-1.8L10.2 8 12 3.2Z\"/><path d=\"m18.3 14.8.8 2.1 2.1.8-2.1.8-.8 2.1-.8-2.1-2.1-.8 2.1-.8.8-2.1Z\"/></svg>","Intelligence"],
+    ["trade","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><path d=\"M5 17 10 12l3.2 3.2L20 8.4\"/><path d=\"M14.8 8.4H20v5.2\"/></svg>","Trade"],
+    ["news","<svg viewBox=\"0 0 24 24\" aria-hidden=\"true\"><rect x=\"4\" y=\"4\" width=\"16\" height=\"16\" rx=\"3\"/><path d=\"M8 8h8\"/><path d=\"M8 12h3\"/><path d=\"M14 12h2\"/><path d=\"M8 16h8\"/></svg>","News"]
   ];
 
   var existing = nav.querySelectorAll("[data-app-view]");
@@ -6390,7 +6390,7 @@ function ensurePrimaryNavigationStructure() {
     var icon = document.createElement("span");
     icon.className = "ios-nav-icon";
     icon.setAttribute("aria-hidden","true");
-    icon.textContent = item[1];
+    icon.innerHTML = item[1];
 
     var label = document.createElement("span");
     label.className = "ios-nav-label";
