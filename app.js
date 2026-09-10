@@ -6075,17 +6075,27 @@ function answerAIQuestion(question) {
   }
 
   function updateTradeDuckSummary() {
-    var state = null;
-    try {
-      state = buildAIState();
-    } catch (e) {}
-
+    /*
+     * The full trade engine already returns { plans: [...] }.
+     * The simple card used to treat that wrapper object as a single plan,
+     * which is why its values rendered as dashes while the detailed planner worked.
+     */
+    var tradeState = null;
     var plan = null;
+
     try {
-      if (state && state.assets && state.assets.length) {
-        plan = buildTradePlan(state.assets[0], state);
+      tradeState = buildTradePlan();
+
+      if (tradeState && Array.isArray(tradeState.plans) && tradeState.plans.length) {
+        /* Prefer the strongest actionable setup shown by the detailed planner.
+           If everything is neutral, show the first WAIT asset instead. */
+        plan = tradeState.plans.find(function (item) {
+          return item && item.direction && item.direction !== "WAIT";
+        }) || tradeState.plans[0];
       }
-    } catch (e) {}
+    } catch (e) {
+      console.warn("Simple Trade Plan could not be updated:", e);
+    }
 
     var direction = el("duckDirection");
     var directionNote = el("duckDirectionNote");
@@ -6104,17 +6114,27 @@ function answerAIQuestion(question) {
       if (stop) stop.textContent = "$—";
       if (target) target.textContent = "$—";
       if (size) size.textContent = "—";
+      if (sizeNote) sizeNote.textContent = "Portfolio AI will calculate a risk-based size from your USD capital.";
       if (headline) headline.textContent = "Pick an asset and Portfolio AI will do the maths.";
       if (explain) explain.textContent = "Keep your risk small. Portfolio AI will handle the numbers.";
       return;
     }
 
     var dir = String(plan.direction || "WAIT").toUpperCase();
-    if (direction) direction.textContent = dir;
-    if (directionNote) directionNote.textContent = dir === "WAIT" ? "No clean setup yet" : "Portfolio AI trade direction";
+    var symbol = plan.asset && plan.asset.symbol ? plan.asset.symbol : "this asset";
+
+    if (direction) direction.textContent = dir === "LONG" ? "BUY" : dir === "SHORT" ? "SELL" : "WAIT";
+    if (directionNote) {
+      directionNote.textContent = dir === "WAIT"
+        ? symbol + " · No clean setup yet"
+        : symbol + " · Portfolio AI trade direction";
+    }
+
     if (entry) entry.textContent = safeMoney(plan.entry);
-    if (stop) stop.textContent = safeMoney(plan.stop);
-    if (target) target.textContent = safeMoney(plan.target);
+
+    /* Individual plans use stopPrice / targetPrice (not stop / target). */
+    if (stop) stop.textContent = dir === "WAIT" ? "$—" : safeMoney(plan.stopPrice);
+    if (target) target.textContent = dir === "WAIT" ? "$—" : safeMoney(plan.targetPrice);
 
     try {
       var display = positionSizeDisplay(plan);
@@ -6126,8 +6146,8 @@ function answerAIQuestion(question) {
 
     if (headline) {
       headline.textContent = dir === "WAIT"
-        ? "No trade yet — Portfolio AI says wait."
-        : dir + " setup ready. Follow the four numbers below.";
+        ? symbol + " is a WAIT — no trade proposed yet."
+        : symbol + " " + (dir === "LONG" ? "BUY" : "SELL") + " setup ready.";
     }
 
     if (explain) {
