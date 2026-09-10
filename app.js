@@ -6711,7 +6711,51 @@ function attachAppNavigation() {
   }
 
 
+
+  /* ========================= DEMO RESET ========================= */
+
+  function resetPortfolioDemo() {
+    var hasDemoState =
+      selectedAssets.length > 0 ||
+      Object.keys(marketData || {}).length > 0 ||
+      !!portfolioResults ||
+      !!aiState;
+
+    if (
+      hasDemoState &&
+      !window.confirm(
+        "Reset this portfolio?\n\nThis clears the current asset selections, loaded analysis, forecast and trade-plan results so you can start a new demo."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      localStorage.setItem(
+        APP_VIEW_STORAGE_KEY,
+        "portfolio"
+      );
+      localStorage.setItem(
+        "portfolio-ai-active-view",
+        "portfolio"
+      );
+    } catch (error) {}
+
+    window.location.reload();
+  }
+
+
   function attachEvents() {
+    var resetPortfolio =
+      el("resetPortfolio");
+
+    if (resetPortfolio) {
+      resetPortfolio.addEventListener(
+        "click",
+        resetPortfolioDemo
+      );
+    }
+
     var freezePortfolio =
       el("freezePortfolio");
 
