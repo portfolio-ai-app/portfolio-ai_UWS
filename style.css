@@ -5850,3 +5850,52 @@ body:before{
 
 /* Static market-news snapshot states */
 .news-provider-hint.cached::before{content:"";display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--green);vertical-align:1px}.news-provider-hint.limited::before{content:"";display:inline-block;width:7px;height:7px;margin-right:7px;border-radius:50%;background:var(--orange);vertical-align:1px}
+
+/* =========================================================
+   PORTFOLIO DEMO RESET
+   ========================================================= */
+.button-reset{
+  min-height:44px;
+  padding:0 17px;
+  border:1px solid rgba(215,0,21,.20);
+  border-radius:14px;
+  background:var(--surface-secondary);
+  color:var(--red);
+  font-weight:680;
+  cursor:pointer;
+  transition:
+    transform .18s ease,
+    background .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease;
+}
+
+.button-reset:hover{
+  transform:translateY(-1px);
+  background:var(--red-soft);
+  border-color:rgba(215,0,21,.34);
+}
+
+.button-reset:active{
+  transform:scale(.98);
+}
+
+html[data-theme="dark"] .button-reset{
+  border-color:rgba(255,69,58,.24);
+}
+
+html[data-theme="dark"] .button-reset:hover{
+  border-color:rgba(255,69,58,.42);
+}
+
+@media(max-width:700px){
+  .action-buttons{
+    flex-wrap:wrap;
+  }
+
+  .button-reset{
+    order:3;
+    width:100%;
+  }
+}
+
